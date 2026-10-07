@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Taksopark reklama</title>
+<style>
+  :root{--bg:#10201a;--bg2:#14231e;--card:#1b2e26;--lime:#d4ed69;--ink:#182721;--cream:#f6f7f3;--muted:#9fb0a4}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+  body{font-family:'Inter Display','Inter',sans-serif;color:var(--cream);-webkit-font-smoothing:antialiased}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#1d3529 0%,var(--bg) 60%)}
+  .abs{position:absolute}
+  .glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:.35;background:var(--lime)}
+  .speed{position:absolute;width:4px;border-radius:4px;background:linear-gradient(to bottom,transparent,#d4ed6940,transparent)}
+  .scene{position:absolute;inset:0}
+  .mask{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+  .mask>span{display:inline-block}
+  .lime{color:var(--lime)}
+  .eyebrow{font-family:Inter;font-weight:600;font-size:30px;letter-spacing:9px;text-transform:uppercase;color:var(--muted)}
+  .h-xl{font-weight:900;font-size:168px;line-height:1.02;letter-spacing:-6px}
+  .h-l{font-weight:800;font-size:112px;line-height:1.05;letter-spacing:-4px}
+  .pill{display:inline-flex;align-items:center;gap:22px;background:var(--lime);color:var(--ink);font-weight:700;font-size:44px;padding:28px 44px;border-radius:999px}
+  .pill .dot{width:18px;height:18px;border-radius:50%;background:var(--ink)}
+  .ring{position:absolute;left:50%;top:50%;border:2px solid #d4ed6955;border-radius:50%;transform:translate(-50%,-50%)}
+  .card{position:absolute;left:80px;width:920px;height:300px;border-radius:44px;background:var(--card);border:2px solid #2c4337;display:flex;align-items:center;gap:40px;padding:0 56px;overflow:hidden}
+  .card .num{font-family:Inter;font-weight:600;font-size:28px;letter-spacing:4px;color:var(--muted)}
+  .card h3{font-weight:800;font-size:84px;letter-spacing:-3px;margin:6px 0 10px}
+  .card p{font-family:Inter;font-weight:500;font-size:38px;color:var(--muted)}
+  .card .car{width:300px;flex-shrink:0;margin-left:auto}
+  .card.on{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+  .card.on p,.card.on .num{color:#3b5130}
+  .feat{position:absolute;left:80px;right:80px;display:flex;align-items:center;gap:40px;font-weight:700;font-size:58px;letter-spacing:-1.5px}
+  .tick{width:104px;height:104px;border-radius:30px;background:var(--lime);display:grid;place-items:center;flex-shrink:0}
+  .btn{display:inline-flex;align-items:center;gap:26px;background:var(--lime);color:var(--ink);font-weight:800;font-size:56px;padding:42px 70px;border-radius:999px;letter-spacing:-1px}
+  .phone{font-weight:800;font-size:88px;letter-spacing:-2px}
+  .brand{display:flex;align-items:center;gap:28px;font-weight:900;font-size:76px;letter-spacing:-3px}
+  .progress{position:absolute;left:80px;right:80px;bottom:90px;height:8px;border-radius:8px;background:#ffffff14;overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--lime);border-radius:8px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="glowA" style="width:900px;height:900px"></div>
+  <div class="glow" id="glowB" style="width:700px;height:700px;opacity:.18"></div>
+  <div id="speedLines"></div>
+
+  <!-- 1. HOOK -->
+  <div class="scene" id="s1">
+    <div class="abs eyebrow" id="s1eyebrow" style="left:80px;top:430px">Toshkent bo‘ylab</div>
+    <div class="abs h-xl" style="left:80px;top:520px;width:960px">
+      <span class="mask"><span id="s1w1">Taksi</span></span><br>
+      <span class="mask"><span id="s1w2" class="lime">kerakmi?</span></span>
+    </div>
+    <div class="abs" id="s1pill" style="left:80px;top:1010px"><span class="pill"><span class="dot"></span>Bir necha daqiqada yetib boramiz</span></div>
+    <div class="abs" id="road" style="left:0;top:1430px;width:1080px;height:220px">
+      <div class="abs" style="left:0;right:0;top:0;height:220px;background:#0b1712;border-block:2px solid #22382d"></div>
+      <div class="abs" id="roadDash" style="left:0;top:104px;height:12px;width:2400px;background:repeating-linear-gradient(90deg,#d4ed6966 0 90px,transparent 90px 170px)"></div>
+    </div>
+    <svg class="abs" id="taxiTop" viewBox="0 0 360 170" style="width:360px;top:1455px;left:0">
+      <rect x="10" y="12" width="340" height="146" rx="56" fill="#d4ed69"/>
+      <rect x="92" y="26" width="104" height="118" rx="26" fill="#182721"/>
+      <rect x="226" y="30" width="62" height="110" rx="22" fill="#182721"/>
+      <rect x="196" y="58" width="30" height="54" rx="8" fill="#182721"/>
+      <rect x="132" y="66" width="40" height="38" rx="8" fill="#d4ed69"/>
+      <text x="152" y="93" font-family="Inter" font-weight="900" font-size="26" text-anchor="middle" fill="#182721">T</text>
+      <rect x="322" y="34" width="22" height="26" rx="8" fill="#fffbe0"/>
+      <rect x="322" y="110" width="22" height="26" rx="8" fill="#fffbe0"/>
+      <rect x="14" y="36" width="12" height="22" rx="5" fill="#e0543d"/>
+      <rect x="14" y="112" width="12" height="22" rx="5" fill="#e0543d"/>
+    </svg>
+  </div>
+
+  <!-- 2. BRAND -->
+  <div class="scene" id="s2">
+    <div class="ring" id="r1"></div><div class="ring" id="r2"></div><div class="ring" id="r3"></div>
+    <svg class="abs" id="logo" viewBox="0 0 100 100" style="width:300px;height:300px;left:390px;top:620px">
+      <rect width="100" height="100" rx="26" fill="#d4ed69"/>
+      <path d="M25 74V27h13l23 28V27h14v47H62L39 46v28z" fill="#111c1a"/>
+      <path d="M58 16h19v5H58z" fill="#111c1a"/>
+    </svg>
+    <div class="abs" id="parkName" style="left:0;right:0;top:990px;text-align:center;font-weight:900;font-size:150px;letter-spacing:-6px"></div>
+    <div class="abs" id="s2sub" style="left:0;right:0;top:1190px;text-align:center;font-family:Inter;font-weight:500;font-size:46px;color:var(--muted)">Shahar bo‘ylab qulay va xavfsiz safarlar</div>
+  </div>
+
+  <!-- 3. TARIFFS -->
+  <div class="scene" id="s3">
+    <div class="abs eyebrow" id="s3eyebrow" style="left:80px;top:300px">Uchta tarif</div>
+    <div class="abs h-l" style="left:80px;top:370px;width:940px">
+      <span class="mask"><span id="s3w1">O‘zingizga</span></span><br>
+      <span class="mask"><span id="s3w2" class="lime">mos safar</span></span>
+    </div>
+    <div class="card" id="c0" style="top:740px"><div><div class="num">01</div><h3>Ekonom</h3><p>Har kun uchun qulay</p></div><svg class="car" viewBox="0 0 300 120"><use href="#carSide"/></svg></div>
+    <div class="card" id="c1" style="top:1080px"><div><div class="num">02</div><h3>Komfort</h3><p>Kengroq, qulayroq</p></div><svg class="car" viewBox="0 0 300 120"><use href="#carSide"/></svg></div>
+    <div class="card" id="c2" style="top:1420px"><div><div class="num">03</div><h3>Biznes</h3><p>Yuqori darajadagi safar</p></div><svg class="car" viewBox="0 0 300 120"><use href="#carSide"/></svg></div>
+  </div>
+
+  <!-- 4. BENEFITS -->
+  <div class="scene" id="s4">
+    <svg class="abs" id="route" viewBox="0 0 1080 1920" style="left:0;top:0;width:1080px;height:1920px">
+      <path id="routePath" d="M150 1780 C 260 1560, 520 1700, 600 1500 S 980 1300, 900 1080" fill="none" stroke="#d4ed69" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 22" opacity=".55"/>
+      <circle id="pinA" cx="150" cy="1780" r="26" fill="#d4ed69"/>
+      <g id="pinB"><circle cx="900" cy="1080" r="40" fill="#d4ed69"/><circle cx="900" cy="1080" r="14" fill="#10201a"/></g>
+    </svg>
+    <div class="abs eyebrow" id="s4eyebrow" style="left:80px;top:250px">Nega aynan biz?</div>
+    <div class="feat" id="f0" style="top:340px"><span class="tick"><svg width="54" height="54" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#182721" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Narx oldindan ma’lum</div>
+    <div class="feat" id="f1" style="top:504px"><span class="tick"><svg width="54" height="54" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#182721" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tajribali haydovchilar</div>
+    <div class="feat" id="f2" style="top:668px"><span class="tick"><svg width="54" height="54" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#182721" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Safarni real vaqtda kuzating</div>
+    <div class="feat" id="f3" style="top:832px"><span class="tick"><svg width="54" height="54" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#182721" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Qulay mobil ilova</div>
+  </div>
+
+  <!-- 5. CTA -->
+  <div class="scene" id="s5">
+    <div class="abs eyebrow" id="s5eyebrow" style="left:0;right:0;top:470px;text-align:center">Kutib turmang</div>
+    <div class="abs h-l" style="left:0;right:0;top:550px;text-align:center">
+      <span class="mask"><span id="s5w1">Hoziroq</span></span><br>
+      <span class="mask"><span id="s5w2" class="lime">buyurtma bering</span></span>
+    </div>
+    <div class="abs" id="s5btn" style="left:0;right:0;top:900px;text-align:center"><span class="btn">
+      <svg width="60" height="60" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14" fill="none" stroke="#182721" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Ilovani yuklab oling</span></div>
+    <div class="abs" id="s5phoneLbl" style="left:0;right:0;top:1180px;text-align:center;font-family:Inter;font-weight:500;font-size:40px;color:var(--muted)">yoki qo‘ng‘iroq qiling</div>
+    <div class="abs phone" id="s5phone" style="left:0;right:0;top:1240px;text-align:center"></div>
+    <div class="abs" id="s5brand" style="left:0;right:0;top:1560px;display:flex;justify-content:center"><div class="brand">
+      <svg viewBox="0 0 100 100" width="96" height="96"><rect width="100" height="100" rx="26" fill="#d4ed69"/><path d="M25 74V27h13l23 28V27h14v47H62L39 46v28z" fill="#111c1a"/><path d="M58 16h19v5H58z" fill="#111c1a"/></svg>
+      <span id="s5name"></span></div></div>
+  </div>
+
+  <div class="progress"><i id="bar"></i></div>
+  <div class="abs" id="flash" style="inset:0;background:var(--lime);opacity:0"></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="carSide">
+      <path d="M18 86 C18 66 34 58 58 56 L92 26 C100 18 110 15 122 15 L190 15 C204 15 214 20 224 30 L250 56 C272 58 288 66 288 82 L288 92 C288 96 285 98 281 98 L24 98 C20 98 18 95 18 92 Z" fill="currentColor" opacity=".95"/>
+      <path d="M104 52 L126 28 L150 28 L150 52 Z M164 52 L164 28 L190 28 C198 28 204 31 210 38 L222 52 Z" fill="#10201a" opacity=".85"/>
+      <circle cx="80" cy="98" r="22" fill="#0b1712"/><circle cx="80" cy="98" r="9" fill="#9fb0a4"/>
+      <circle cx="226" cy="98" r="22" fill="#0b1712"/><circle cx="226" cy="98" r="9" fill="#9fb0a4"/>
+    </g>
+  </defs>
+</svg>
+
+<script>
+// ---------- Sozlamalar (shu yerni o'zgartiring) ----------
+const CONFIG = {
+  parkName: 'Taksopark',
+  phone: '+998 XX XXX XX XX',
+};
+// ---------------------------------------------------------
+const DURATION = 22; // sekund, 120 BPM => 1 takt = 2 s
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, start, dur) => clamp((t - start) / dur);
+const outCubic = x => 1 - Math.pow(1 - x, 3);
+const outQuint = x => 1 - Math.pow(1 - x, 5);
+const inCubic = x => x * x * x;
+const inOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const outBack = x => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+
+function set(el, { o = 1, x = 0, y = 0, s = 1, r = 0, blur } = {}) {
+  el = typeof el === 'string' ? $(el) : el;
+  el.style.opacity = o;
+  el.style.transform = `translate(${x}px,${y}px) scale(${s}) rotate(${r}deg)`;
+  if (blur !== undefined) el.style.filter = blur > 0.05 ? `blur(${blur}px)` : 'none';
+}
+// Matn pastdan "maska" ichidan chiqadi
+function rise(id, t, start, dur = .55) {
+  const k = outQuint(p(t, start, dur));
+  $(id).style.transform = `translateY(${(1 - k) * 115}%)`;
+}
+// Sahna chiqishi: yuqoriga siljib, xiralashib yo'qoladi
+function exitK(t, start, dur = .35) { return inCubic(p(t, start, dur)); }
+function sceneVis(id, t, a, b) { $(id).style.display = (t >= a && t < b) ? 'block' : 'none'; }
+
+// Statik qismlar
+$('parkName').innerHTML = [...CONFIG.parkName].map(c => `<span style="display:inline-block">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+$('s5name').textContent = CONFIG.parkName;
+$('s5phone').textContent = CONFIG.phone;
+const speed = $('speedLines');
+for (let i = 0; i < 14; i++) {
+  const d = document.createElement('div');
+  d.className = 'speed';
+  speed.appendChild(d);
+}
+
+function seek(t) {
+  // ---- Fon ----
+  set('glowA', { o: .30 + .06 * Math.sin(t * 1.3), x: 300 + 160 * Math.sin(t * .35), y: -260 + 120 * Math.cos(t * .3) });
+  set('glowB', { o: .16, x: -280 + 120 * Math.cos(t * .4), y: 1250 + 140 * Math.sin(t * .33) });
+  [...speed.children].forEach((d, i) => {
+    const seed = (i * 7919) % 101 / 101;
+    const len = 160 + seed * 260;
+    const v = 900 + seed * 900;
+    const yy = ((t * v + i * 377) % (1920 + len)) - len;
+    d.style.left = (40 + i * 74 + seed * 30) + 'px';
+    d.style.top = yy + 'px';
+    d.style.height = len + 'px';
+    d.style.opacity = .35 + seed * .5;
+  });
+  $('bar').style.width = (t / DURATION * 100) + '%';
+
+  // Sahna o'tishlarida laym "chaqnash"
+  const flashes = [4, 8, 14, 18];
+  let f = 0;
+  for (const ft of flashes) { const d = t - ft; if (d >= -0.05 && d < .25) f = Math.max(f, .22 * (1 - clamp(d / .25))); }
+  $('flash').style.opacity = f;
+
+  // ---- 1. HOOK (0–4 s) ----
+  sceneVis('s1', t, 0, 4);
+  if (t < 4) {
+    const ex = exitK(t, 3.65);
+    set('s1', { o: 1 - ex, y: -120 * ex });
+    set('s1eyebrow', { o: p(t, .15, .4), x: lerp(-30, 0, outCubic(p(t, .15, .5))) });
+    rise('s1w1', t, .3);
+    rise('s1w2', t, .65);
+    const kp = p(t, 1.35, .5);
+    set('s1pill', { o: clamp(kp * 3), s: lerp(.6, 1, outBack(kp)), y: lerp(40, 0, outCubic(kp)) });
+    const kr = outCubic(p(t, .1, .6));
+    set('road', { o: kr, y: lerp(120, 0, kr) });
+    $('roadDash').style.transform = `translateX(${-((t * 900) % 170)}px)`;
+    // Taksi chapdan kirib, markazda biroz to'xtab, o'ngga uchib ketadi
+    const enter = outQuint(p(t, .5, 1.2));
+    const leave = inCubic(p(t, 2.9, .8));
+    const tx = lerp(-420, 360, enter) + leave * 900 + Math.sin(t * 9) * 3 * (1 - leave);
+    set('taxiTop', { x: tx, y: Math.sin(t * 18) * 1.5, blur: leave * 6 });
+  }
+
+  // ---- 2. BRAND (4–8 s) ----
+  sceneVis('s2', t, 4, 8);
+  if (t >= 4 && t < 8) {
+    const ex = exitK(t, 7.65);
+    set('s2', { o: 1 - ex, s: lerp(1, 1.08, ex) });
+    const kl = p(t, 4.0, .7);
+    set('logo', { o: clamp(kl * 4), s: lerp(.2, 1, outBack(kl)), r: lerp(-25, 0, outCubic(kl)) });
+    ['r1', 'r2', 'r3'].forEach((id, i) => {
+      const k = ((t - 4 - i * .45) % 1.6 + 1.6) % 1.6 / 1.6;
+      const size = lerp(320, 1300, outCubic(k));
+      const el = $(id);
+      el.style.width = el.style.height = size + 'px';
+      el.style.top = '770px';
+      el.style.opacity = t < 4 + i * .45 ? 0 : (1 - k) * .9;
+    });
+    [...$('parkName').children].forEach((c, i) => {
+      const k = p(t, 4.55 + i * .045, .5);
+      set(c, { o: clamp(k * 2.5), y: lerp(90, 0, outQuint(k)), blur: (1 - outCubic(k)) * 8 });
+    });
+    const ks = p(t, 5.3, .6);
+    set('s2sub', { o: ks, y: lerp(30, 0, outCubic(ks)) });
+  }
+
+  // ---- 3. TARIFFS (8–14 s) ----
+  sceneVis('s3', t, 8, 14);
+  if (t >= 8 && t < 14) {
+    const ex = exitK(t, 13.65);
+    set('s3', { o: 1 - ex, y: -120 * ex });
+    set('s3eyebrow', { o: p(t, 8.05, .4) });
+    rise('s3w1', t, 8.1);
+    rise('s3w2', t, 8.35);
+    [0, 1, 2].forEach(i => {
+      const k = p(t, 8.7 + i * .35, .65);
+      set('c' + i, { o: clamp(k * 3), x: lerp(700, 0, outQuint(k)) });
+      // Har bir tarif navbat bilan ajratib ko'rsatiladi (takt bo'yicha)
+      const hl = t >= 10.5 + i * 1.0 && t < 11.5 + i * 1.0 ? true : (i === 2 && t >= 12.5);
+      $('c' + i).classList.toggle('on', hl);
+      const car = $('c' + i).querySelector('.car');
+      const pulse = hl ? outBack(p(t, 10.5 + i, .4)) : 1;
+      car.style.transform = `translateX(${hl ? Math.sin(t * 20) * 2 : 0}px) scale(${hl ? lerp(.85, 1, pulse) : 1})`;
+      car.style.color = hl ? '#182721' : '#d4ed69';
+    });
+  }
+
+  // ---- 4. BENEFITS (14–18 s) ----
+  sceneVis('s4', t, 14, 18);
+  if (t >= 14 && t < 18) {
+    const ex = exitK(t, 17.65);
+    set('s4', { o: 1 - ex, y: -120 * ex });
+    set('s4eyebrow', { o: p(t, 14.05, .4) });
+    [0, 1, 2, 3].forEach(i => {
+      const k = p(t, 14.15 + i * .3, .55);
+      set('f' + i, { o: clamp(k * 2.5), x: lerp(-160, 0, outQuint(k)) });
+      const tick = $('f' + i).querySelector('.tick');
+      tick.style.transform = `scale(${lerp(.3, 1, outBack(p(t, 14.25 + i * .3, .45)))})`;
+    });
+    const path = $('routePath');
+    const L = path.getTotalLength();
+    const kr = inOut(p(t, 14.4, 2.4));
+    path.style.strokeDasharray = `${L}`;
+    path.style.strokeDashoffset = `${L * (1 - kr)}`;
+    set('pinA', { o: p(t, 14.3, .3) });
+    const kb = p(t, 16.7, .45);
+    const pb = $('pinB');
+    pb.style.opacity = clamp(kb * 3);
+    pb.style.transformOrigin = '900px 1080px';
+    pb.style.transform = `scale(${lerp(.2, 1, outBack(kb))})`;
+  }
+
+  // ---- 5. CTA (18–22 s) ----
+  sceneVis('s5', t, 18, 22.01);
+  if (t >= 18) {
+    const fadeOut = p(t, 21.45, .55);
+    set('s5', { o: 1 - fadeOut });
+    set('s5eyebrow', { o: p(t, 18.05, .4) });
+    rise('s5w1', t, 18.1);
+    rise('s5w2', t, 18.35);
+    const kb = p(t, 18.75, .55);
+    const beat = Math.pow(1 - ((t - 18) % .5) / .5, 3); // musiqa urg'usiga mos "puls"
+    set('s5btn', { o: clamp(kb * 3), s: lerp(.6, 1, outBack(kb)) * (1 + (t > 19.3 ? .025 * beat : 0)) });
+    const kp = p(t, 19.2, .5);
+    set('s5phoneLbl', { o: kp });
+    set('s5phone', { o: kp, y: lerp(40, 0, outCubic(kp)) });
+    const kn = p(t, 19.6, .6);
+    set('s5brand', { o: kn, y: lerp(40, 0, outCubic(kn)) });
+  }
+}
+window.seek = seek;
+window.DURATION = DURATION;
+seek(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules/
+chiqish/*
+!chiqish/reklama-instagram.mp4
+!chiqish/muqova.png

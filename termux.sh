@@ -21,11 +21,12 @@ cd kassa_bot
 
 say "3/7 Python kutubxonalari (10-20 daqiqa ketishi mumkin)"
 pkg install -y python-cryptography >/dev/null 2>&1 || true
-if ! python -c "import pydantic_core" 2>/dev/null; then
-  pip install --only-binary=:all: pydantic-core >/dev/null 2>&1 \
-    || pkg install -y python-pydantic-core >/dev/null 2>&1 \
-    || { pkg install -y rust >/dev/null; }
-fi
+say "    Rust o'rnatilmoqda (pydantic-core uchun kerak)"
+pkg install -y rust >/dev/null
+pkg install -y maturin >/dev/null 2>&1 || true
+export ANDROID_API_LEVEL="$(getprop ro.build.version.sdk 2>/dev/null || echo 24)"
+export CARGO_BUILD_TARGET=aarch64-linux-android
+[ "$(uname -m)" = "aarch64" ] || unset CARGO_BUILD_TARGET
 export AIOHTTP_NO_EXTENSIONS=1 MULTIDICT_NO_EXTENSIONS=1 YARL_NO_EXTENSIONS=1 \
        FROZENLIST_NO_EXTENSIONS=1 PROPCACHE_NO_EXTENSIONS=1
 pip install "aiogram>=3.15,<4" "SQLAlchemy[asyncio]>=2.0.36,<2.1" "asyncpg>=0.30" "alembic>=1.14" \

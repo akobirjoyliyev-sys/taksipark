@@ -1,4 +1,5 @@
 // NAVO TAXI — © 2026 Jovliyev Akobir Olimjon o‘g‘li. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
+import {shopAction,shopVisible,shopSeed,freshShop,upgradeShop,shopActive} from './shop.mjs';
 export const places = [
   {id:'amir',name:'Amir Temur xiyoboni',area:'Yunusobod tumani',x:60,y:44,lat:41.3111,lon:69.2797},
   {id:'city',name:'Tashkent City',area:'Shayxontohur tumani',x:29,y:48,lat:41.3167,lon:69.2480},
@@ -11,6 +12,9 @@ export const places = [
 ];
 export const labels={pending:'Yangi',accepted:'Haydovchi yo‘lda',arrived:'Haydovchi yetib keldi',riding:'Safarda',completed:'Yakunlangan',cancelled:'Bekor qilingan'};
 export const active=s=>!['completed','cancelled'].includes(s);
+// Haydovchi bir vaqtda faqat bitta safar yoki bitta yetkazib berishni bajaradi.
+export const busy=(s,driverId)=>s.orders.some(o=>o.driverId===driverId&&active(o.status))||!!s.shop?.orders.some(o=>o.courierId===driverId&&shopActive(o.status));
+export {upgradeShop};
 export const money=n=>new Intl.NumberFormat('en-US').format(Math.round(n||0)).replace(/,/g,' ');
 export function quote(state,from,to,tariff){
   const a=places.find(p=>p.id===from),b=places.find(p=>p.id===to),t=state.tariffs.find(t=>t.id===tariff);
@@ -32,9 +36,9 @@ export function seed(){
     {id:'NV-1048',riderId:'demo-rider-other',rider:'Madina R.',phone:'+998900000001',from:'city',to:'airport',tariff:'comfort',price:29500,km:9.2,minutes:28,status:'pending',driverId:null,createdAt:now-90000,commission:12},
     {id:'NV-1047',riderId:'demo-rider-other',rider:'Jasur A.',phone:'+998900000002',from:'chorsu',to:'amir',tariff:'economy',price:17000,km:6.4,minutes:19,status:'riding',driverId:'d2',createdAt:now-1200000,commission:12},
     ...Array.from({length:18},(_,i)=>({id:`NV-${1046-i}`,riderId:'history',rider:['Malika S.','Akmal T.','Shahzod B.'][i%3],phone:'+998900000000',from:places[i%8].id,to:places[(i+3)%8].id,tariff:['economy','comfort','business'][i%3],price:15000+(i%7)*3500,km:4.5+i%6,minutes:15+i,status:'completed',driverId:drivers[i%4].id,createdAt:now-i*3600000-2400000,completedAt:now-i*3600000-600000,commission:12}))
-  ],audit:[],nextOrder:1049};
+  ],shop:shopSeed(now),audit:[],nextOrder:1049};
 }
-export function freshState(){const s=seed();return {...s,drivers:[],orders:[],audit:[],nextOrder:1001};}
+export function freshState(){const s=seed();return {...s,drivers:[],orders:[],shop:freshShop(),audit:[],nextOrder:1001};}
 function text(v,label,max=80){if(typeof v!=='string'||!v.trim()||v.trim().length>max)throw Error(`${label}: to‘g‘ri qiymat kiriting.`);return v.trim();}
 export function normalizePhone(v){const p=String(v||'').replace(/[\s()-]/g,'');if(!/^\+998\d{9}$/.test(p))throw Error('Telefon +998 bilan va 9 ta raqamdan iborat bo‘lsin.');return p;}
 export function applyAction(state,user,action,p){
@@ -50,7 +54,7 @@ export function applyAction(state,user,action,p){
     check(admin||user.role==='driver');const o=s.orders.find(o=>o.id===p.id),d=s.drivers.find(d=>d.id===(admin?p.driverId:user.driverId));
     check(o?.status==='pending','Buyurtma boshqa haydovchiga berilgan yoki faol emas.');
     check(d&&!d.blocked&&d.online,'Haydovchi mavjud emas yoki oflayn.');
-    check(!s.orders.some(o=>o.driverId===d.id&&active(o.status)),'Haydovchi hozir band.');
+    check(!busy(s,d.id),'Haydovchi hozir band.');
     o.driverId=d.id;o.status='accepted';
   } else if(action==='order.status'){
     const o=s.orders.find(o=>o.id===p.id);check(!!o,'Buyurtma topilmadi.');
@@ -59,23 +63,26 @@ export function applyAction(state,user,action,p){
     o.status=p.status;if(p.status==='completed')o.completedAt=Date.now();
   } else if(action==='driver.online'){
     const d=s.drivers.find(d=>d.id===(admin?p.id:user.driverId));check(!!d&&(admin||user.role==='driver'));check(!d.blocked,'Profil bloklangan. Admin bilan bog‘laning.');
-    check(typeof p.online==='boolean');check(p.online||!s.orders.some(o=>o.driverId===d.id&&active(o.status)),'Avval faol safarni yakunlang.');d.online=p.online;
+    check(typeof p.online==='boolean');check(p.online||!busy(s,d.id),'Avval faol safar yoki yetkazib berishni yakunlang.');d.online=p.online;
   } else if(action==='driver.save'){
     check(admin);const d={id:p.id||`d-${Date.now()}`,name:text(p.name,'Ism'),phone:normalizePhone(p.phone),car:text(p.car,'Avtomobil'),plate:text(p.plate,'Davlat raqami',20)};
     check(!s.drivers.some(x=>x.id!==d.id&&(x.phone===d.phone||x.plate===d.plate)),'Bu telefon yoki davlat raqami allaqachon mavjud.');
     const i=s.drivers.findIndex(x=>x.id===d.id);if(i>=0)s.drivers[i]={...s.drivers[i],...d};else s.drivers.push({...d,online:false,blocked:false,rating:0});
   } else if(action==='driver.block'){
-    check(admin);const d=s.drivers.find(x=>x.id===p.id);check(!!d);check(!s.orders.some(o=>o.driverId===d.id&&active(o.status)),'Avval haydovchining faol safarini yakunlang yoki bekor qiling.');d.blocked=!d.blocked;if(d.blocked)d.online=false;
+    check(admin);const d=s.drivers.find(x=>x.id===p.id);check(!!d);check(!busy(s,d.id),'Avval haydovchining faol safari yoki yetkazib berishini yakunlang yoki bekor qiling.');d.blocked=!d.blocked;if(d.blocked)d.online=false;
   } else if(action==='settings.save'){
     check(admin);const c=Number(p.commission);check(Number.isFinite(c)&&c>=0&&c<=40,'Komissiya 0–40% oralig‘ida bo‘lsin.');
     s.settings={name:text(p.name,'Park nomi',32),city:text(p.city,'Shahar',40),phone:normalizePhone(p.phone),commission:c};
   } else if(action==='tariff.save'){
     check(admin);const t=s.tariffs.find(t=>t.id===p.id);check(!!t);const base=Number(p.base),perKm=Number(p.perKm);check(Number.isFinite(base)&&Number.isFinite(perKm)&&base>=0&&base<=1000000&&perKm>0&&perKm<=100000,'Tarif qiymatlarini tekshiring.');t.base=base;t.perKm=perKm;
+  } else if(action.startsWith('shop.')){upgradeShop(s);shopAction(s,user,action,p,{check,text,busy});
   } else throw Error('Noma’lum amal.');
   s.audit.unshift({at:Date.now(),user:user.name,action,detail:p.id||''});s.audit=s.audit.slice(0,500);
   return s;
 }
 export function visibleState(s,u){
+  s=upgradeShop({...s});
   if(u.role==='admin')return s;
-  return {...s,audit:[],orders:s.orders.filter(o=>u.role==='rider'?o.riderId===u.id:(o.driverId===u.driverId||o.status==='pending')).map(o=>u.role==='driver'&&o.driverId!==u.driverId?{...o,phone:'',rider:'Yo‘lovchi'}:o),drivers:s.drivers.filter(d=>u.role==='driver'?d.id===u.driverId:s.orders.some(o=>o.riderId===u.id&&o.driverId===d.id)).map(d=>({...d,phone:d.phone}))};
+  const couriers=new Set(s.shop.orders.filter(o=>o.customerId===u.id&&o.courierId).map(o=>o.courierId));
+  return {...s,audit:[],shop:shopVisible(s,u),orders:s.orders.filter(o=>u.role==='rider'?o.riderId===u.id:(o.driverId===u.driverId||o.status==='pending')).map(o=>u.role==='driver'&&o.driverId!==u.driverId?{...o,phone:'',rider:'Yo‘lovchi'}:o),drivers:s.drivers.filter(d=>u.role==='driver'?d.id===u.driverId:couriers.has(d.id)||s.orders.some(o=>o.riderId===u.id&&o.driverId===d.id)).map(d=>({...d,phone:d.phone}))};
 }

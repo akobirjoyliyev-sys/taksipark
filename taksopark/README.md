@@ -64,6 +64,7 @@ Sinov: Yo‘lovchi → yo‘nalish va tarif → Taksi chaqirish → Haydovchi ro
 - Haydovchi: kirish, onlayn/oflayn, yangi buyurtma qabul qilish, kelish/boshlash/yakunlash, safar va daromad tarixi.
 - Admin: umumiy ko‘rsatkichlar, buyurtma yaratish/qidirish/filtrlash/biriktirish, safar holati, haydovchi yaratish/tahrirlash/bloklash, tarif, komissiya, park nomi, hisobot, CSV eksport, faollik jurnali.
 - Server: SQLite, parol xeshi, 12 soatlik sessiya, rollar bo‘yicha ruxsat, server hisoblaydigan narx, parallel buyurtma qabulini tekshirish.
+- Do‘kon: kategoriyalar, qidiruv, mahsulot rasmlari, savat, server hisoblaydigan narx va yetkazish, ombor qoldig‘i (bekor qilinsa qaytadi), naqd to‘lov, buyurtma bosqichlari (Yangi → Yig‘ilmoqda → Kuryer kutilmoqda → Yo‘lda → Yetkazildi). Haydovchilar kuryer sifatida buyurtma oladi; bir vaqtda faqat bitta safar yoki bitta yetkazish. Admin: mahsulot/kategoriya boshqaruvi, rasm yuklash, yetkazish narxi, bepul yetkazish chegarasi, eng kam buyurtma, do‘konni yopish.
 - Android: internet bo‘lmaganda demo rejim, HTTPS API ulanishi, ilova ichiga joylangan interfeys. Android 8+ va yangilangan Android System WebView kerak.
 
 ## Hali ulanmagan qismlar
@@ -78,7 +79,7 @@ Xarita **sxematik demo**. 8 ta Toshkent manzili mavjud. Masofa koordinatalardan 
 npm test
 ```
 
-16 ta test o‘tdi: ruxsatlar, buyurtma bosqichlari, narxni soxtalashtirishdan himoya, parallel qabul, ma’lumot maxfiyligi, sozlamalar, API kirish va server qayta ishga tushganda saqlanish. Brauzerda nomni o‘zgartirish va yo‘lovchi → haydovchi → yakunlangan safar jarayoni sinovdan o‘tkazildi. Android APK yig‘ildi, v2/v3 imzolari tekshirildi. Haqiqiy Android qurilmada o‘rnatish va uzoq muddatli ish sinovi bajarilmagan.
+27 ta test o‘tdi: ruxsatlar, do‘kon (narx, ombor, kuryer, rasm yuklash), buyurtma bosqichlari, narxni soxtalashtirishdan himoya, parallel qabul, ma’lumot maxfiyligi, sozlamalar, API kirish va server qayta ishga tushganda saqlanish. Brauzerda nomni o‘zgartirish va yo‘lovchi → haydovchi → yakunlangan safar jarayoni sinovdan o‘tkazildi. Android APK yig‘ildi, v2/v3 imzolari tekshirildi. Haqiqiy Android qurilmada o‘rnatish va uzoq muddatli ish sinovi bajarilmagan.
 
 ## APKni qayta yig‘ish
 

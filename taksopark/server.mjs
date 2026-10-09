@@ -8,6 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {applyAction,freshState,normalizePhone,visibleState} from './public/domain.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const dir=process.env.DATA_DIR||path.join(root,'data');mkdirSync(dir,{recursive:true});
+const imageDir=path.join(dir,'images');mkdirSync(imageDir,{recursive:true});
 const db=new DatabaseSync(path.join(dir,'park.sqlite'));
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,name TEXT NOT NULL,phone TEXT NOT NULL UNIQUE,role TEXT NOT NULL,driverId TEXT,password TEXT NOT NULL);
@@ -31,7 +32,7 @@ const tokenHash=t=>createHash('sha256').update(t).digest('hex');
 const attempts=new Map();
 function rate(req){const key=req.socket.remoteAddress;const n=Date.now();const v=attempts.get(key)||{n:0,t:n};if(n-v.t>900000){v.n=0;v.t=n;}v.n++;attempts.set(key,v);if(v.n>40)throw Error('Urinishlar juda ko‘p. 15 daqiqadan keyin qayta urinib ko‘ring.');}
 const cleanupTimer=setInterval(()=>{const now=Date.now();for(const [key,v]of attempts)if(now-v.t>900000)attempts.delete(key);db.prepare('DELETE FROM sessions WHERE expires<?').run(now);},60000);cleanupTimer.unref();
-async function body(req){let str='';for await(const chunk of req){str+=chunk;if(str.length>32000)throw Error('So‘rov juda katta.');}try{return JSON.parse(str||'{}');}catch{throw Error('JSON noto‘g‘ri.');}}
+async function body(req,max=32000){let str='';for await(const chunk of req){str+=chunk;if(str.length>max)throw Error('So‘rov juda katta.');}try{return JSON.parse(str||'{}');}catch{throw Error('JSON noto‘g‘ri.');}}
 const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');
   const allowed=['https://appassets.androidplatform.net',...(process.env.ALLOWED_ORIGINS||'').split(',').filter(Boolean)];
@@ -42,6 +43,11 @@ const server=http.createServer(async(req,res)=>{
   const json=(status,obj)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(obj));};
   if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
   try{
+    if(req.method==='GET'&&url.pathname.startsWith('/images/')){
+      const m=/^\/images\/([a-f0-9]{24}\.(jpg|png|webp))$/.exec(url.pathname),f=m&&path.join(imageDir,m[1]);
+      if(!f||!existsSync(f))return json(404,{error:'Rasm topilmadi.'});
+      res.writeHead(200,{'Content-Type':{jpg:'image/jpeg',png:'image/png',webp:'image/webp'}[m[2]],'Cache-Control':'public, max-age=31536000, immutable'});res.end(readFileSync(f));return;
+    }
     if(!url.pathname.startsWith('/api/')){
       if(req.method!=='GET')return json(405,{error:'Usul ruxsat etilmagan.'});
       const rel=url.pathname==='/'?'index.html':decodeURIComponent(url.pathname.slice(1));
@@ -75,6 +81,13 @@ const server=http.createServer(async(req,res)=>{
     if(req.method==='POST'&&url.pathname==='/api/password'){
       const p=await body(req);validPassword(p.password);if(!verify(p.oldPassword||'',u.password))throw Error('Eski parol noto‘g‘ri.');
       db.prepare('UPDATE users SET password=? WHERE id=?').run(hash(p.password),u.id);db.prepare('DELETE FROM sessions WHERE userId=? AND token<>?').run(u.id,tokenHash(raw));return json(200,{ok:true});
+    }
+    if(req.method==='POST'&&url.pathname==='/api/image'){
+      if(u.role!=='admin')return json(403,{error:'Rasmni faqat administrator yuklaydi.'});
+      const m=/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec((await body(req,2000000)).data||'');if(!m)throw Error('Rasm JPG, PNG yoki WEBP bo‘lsin.');
+      const buf=Buffer.from(m[2],'base64'),magic={jpeg:[0xff,0xd8,0xff],png:[0x89,0x50,0x4e,0x47],webp:[0x52,0x49,0x46,0x46]}[m[1]];
+      if(buf.length>1400000)throw Error('Rasm juda katta.');if(!magic.every((b,i)=>buf[i]===b))throw Error('Rasm fayli buzilgan.');
+      const name=randomBytes(12).toString('hex')+'.'+(m[1]==='jpeg'?'jpg':m[1]);writeFileSync(path.join(imageDir,name),buf);return json(200,{url:'/images/'+name});
     }
     if(req.method==='POST'&&url.pathname==='/api/action'){
       const {action,payload:p}=await body(req);if(!p||typeof p!=='object')throw Error('Ma’lumot noto‘g‘ri.');

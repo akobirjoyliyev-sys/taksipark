@@ -22,12 +22,12 @@ test('API auth, trip flow, permissions, atomic assignment and persistence',async
   const createDriver=await req('action',{action:'driver.save',payload:{name:'Test Driver',phone:'+998909000002',car:'Cobalt',plate:'01 A 100 AA',password:'Test-Driver-48251!'}},admin.token);assert.equal(createDriver.status,200);
   const driver=await req('login',{phone:'+998909000002',password:'Test-Driver-48251!'});assert.equal(driver.user.role,'driver');
   await req('action',{action:'driver.online',payload:{online:true}},driver.token);
-  const created=await req('action',{action:'order.create',payload:{from:'amir',to:'airport',tariff:'comfort',price:1}},rider.token);assert.equal(created.status,200);const order=created.state.orders[0];assert.ok(order.price>1000);
+  const created=await req('action',{action:'order.create',payload:{from:'markaz',to:'hurriyat',tariff:'comfort',price:1}},rider.token);assert.equal(created.status,200);const order=created.state.orders[0];assert.ok(order.price>1000);
   const pending=await req('state',undefined,driver.token);assert.equal(pending.state.orders[0].phone,'');
   const competing=await Promise.all([1,2].map(()=>req('action',{action:'order.assign',payload:{id:order.id}},driver.token)));assert.deepEqual(competing.map(r=>r.status).sort(),[200,400]);
   assert.equal((await req('action',{action:'order.status',payload:{id:order.id,status:'completed'}},rider.token)).status,400);
   for(const status of ['arrived','riding','completed'])assert.equal((await req('action',{action:'order.status',payload:{id:order.id,status}},driver.token)).status,200);
-  const update=await req('action',{action:'settings.save',payload:{name:'TEST PARK',city:'Toshkent',phone:'+998901234567',commission:15}},admin.token);assert.equal(update.status,200);
+  const update=await req('action',{action:'settings.save',payload:{name:'TEST PARK',city:'Qumqo‘rg‘on',phone:'+998901234567',commission:15}},admin.token);assert.equal(update.status,200);
   const r2=await req('register',{phone:'+998909000003',password:'Test-Rider-48251!',name:'Other Rider'});assert.equal(r2.state.orders.length,0);
   const bad=await req('action',{action:'driver.save',payload:{name:'Wrong',phone:r2.user.phone,car:'Car',plate:'01 A 999 ZZ',password:'Test-Driver-48251!'}},admin.token);assert.equal(bad.status,400);assert.equal((await req('state',undefined,admin.token)).state.drivers.length,1);
   await stop();await start();const persisted=await req('state',undefined,rider.token);assert.equal(persisted.state.settings.name,'TEST PARK');assert.equal(persisted.state.orders[0].status,'completed');

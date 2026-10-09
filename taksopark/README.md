@@ -58,6 +58,13 @@ APKning kirish ekranida **Yo‘lovchi**, **Haydovchi**, **Admin paneli** tugmala
 
 Sinov: Yo‘lovchi → yo‘nalish va tarif → Taksi chaqirish → Haydovchi roliga o‘tish → Qabul qilish → Yetib keldim → Safarni boshlash → Safarni yakunlash → Yo‘lovchi safarlar tarixi. Admin sozlamalaridan nomni o‘zgartirib barcha rollarda natijani ko‘rish mumkin.
 
+## v0.3 — yangi dizayn va Qumqo‘rg‘on xaritasi
+
+- Sariq-qora taksi uslubidagi yangi dizayn (Inter shrifti ilova ichida), telefon uchun pastki menyu, kompyuterda yon panel.
+- Haqiqiy xarita: Leaflet + OpenStreetMap. Qumqo‘rg‘on tumanining 33 ta manzili (markaz, mahalla, shaharcha, qishloq). Koordinatalar taxminiy — ishga tushirishdan oldin joyida tekshiring (`public/geo.mjs`).
+- Do‘kon yetkazish narxi masofaga qarab 4 zonada (0–3, 3–7, 7–15, 15+ km); admin narxlarni va do‘kon joylashuvini o‘zgartiradi.
+- OpenStreetMap umumiy plitka serveri faqat kichik yuklama uchun. Ko‘p foydalanuvchi bo‘lganda pullik xarita provayderiga o‘tish kerak. Litsenziyalar: Leaflet (BSD-2, `public/vendor/leaflet/LICENSE.txt`), Inter (OFL, `public/fonts/OFL-Inter.txt`).
+
 ## Tayyor funksiyalar
 
 - Yo‘lovchi: kirish, ro‘yxatdan o‘tish, yo‘nalish/tarif tanlash, taxminiy narx, buyurtma, holat, ruxsat etilgan bosqichda bekor qilish, safarlar tarixi.
@@ -79,7 +86,7 @@ Xarita **sxematik demo**. 8 ta Toshkent manzili mavjud. Masofa koordinatalardan 
 npm test
 ```
 
-27 ta test o‘tdi: ruxsatlar, do‘kon (narx, ombor, kuryer, rasm yuklash), buyurtma bosqichlari, narxni soxtalashtirishdan himoya, parallel qabul, ma’lumot maxfiyligi, sozlamalar, API kirish va server qayta ishga tushganda saqlanish. Brauzerda nomni o‘zgartirish va yo‘lovchi → haydovchi → yakunlangan safar jarayoni sinovdan o‘tkazildi. Android APK yig‘ildi, v2/v3 imzolari tekshirildi. Haqiqiy Android qurilmada o‘rnatish va uzoq muddatli ish sinovi bajarilmagan.
+29 ta test o‘tdi: ruxsatlar, do‘kon (narx, ombor, kuryer, rasm yuklash), buyurtma bosqichlari, narxni soxtalashtirishdan himoya, parallel qabul, ma’lumot maxfiyligi, sozlamalar, API kirish va server qayta ishga tushganda saqlanish. Brauzerda nomni o‘zgartirish va yo‘lovchi → haydovchi → yakunlangan safar jarayoni sinovdan o‘tkazildi. Android APK yig‘ildi, v2/v3 imzolari tekshirildi. Haqiqiy Android qurilmada o‘rnatish va uzoq muddatli ish sinovi bajarilmagan.
 
 ## APKni qayta yig‘ish
 

@@ -23,7 +23,7 @@ test('shop API: image upload, checkout and courier delivery',async()=>{
   const img=await fetch(base+up.url,{headers:{Connection:'close'}});assert.equal(img.status,200);assert.equal(img.headers.get('content-type'),'image/png');await img.arrayBuffer();
   assert.equal((await fetch(base+'/images/../park.sqlite',{headers:{Connection:'close'}})).status,404);
   const saved=await req('action',{action:'shop.product.save',payload:{name:'Anor',categoryId:'fruit',price:15000,stock:10,unit:'1 kg',active:'on',image:up.url}},admin.token);assert.equal(saved.status,200);const p=saved.state.shop.products[0];
-  const bought=await req('action',{action:'shop.checkout',payload:{items:[{id:p.id,qty:3}],address:'Qumqo‘rg‘on, 5-uy'}},rider.token);assert.equal(bought.status,200);const o=bought.state.shop.orders[0];assert.equal(o.total,55000);
+  const bought=await req('action',{action:'shop.checkout',payload:{items:[{id:p.id,qty:3}],placeId:'yangishahar',address:'Navro‘z ko‘chasi, 5-uy'}},rider.token);assert.equal(bought.status,200);const o=bought.state.shop.orders[0];assert.equal(o.total,51000);
   const driver=await req('action',{action:'driver.save',payload:{name:'Kuryer',phone:'+998909000012',car:'Damas',plate:'75 A 001 AA',password:'Test-Driver-48251!'}},admin.token);assert.equal(driver.status,200);
   const d=await req('login',{phone:'+998909000012',password:'Test-Driver-48251!'});await req('action',{action:'driver.online',payload:{online:true}},d.token);
   for(const status of ['packing','ready'])assert.equal((await req('action',{action:'shop.status',payload:{id:o.id,status}},admin.token)).status,200);

@@ -53,8 +53,8 @@ const server=http.createServer(async(req,res)=>{
       const rel=url.pathname==='/'?'index.html':decodeURIComponent(url.pathname.slice(1));
       const f=path.resolve(root,'public',rel),base=path.resolve(root,'public')+path.sep;
       if(!f.startsWith(base)||!existsSync(f))return json(404,{error:'Sahifa topilmadi.'});
-      res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
-      res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.svg':'image/svg+xml'})[path.extname(f)]||'application/octet-stream');
+      res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
+      res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.txt':'text/plain; charset=utf-8'})[path.extname(f)]||'application/octet-stream');
       res.end(readFileSync(f));return;
     }
     if(url.pathname==='/api/health')return json(200,{ok:true,name:readState().settings.name});

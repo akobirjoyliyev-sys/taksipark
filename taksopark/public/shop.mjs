@@ -1,10 +1,15 @@
 // NAVO TAXI — © 2026 Jovliyev Akobir Olimjon o‘g‘li. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
 // Do‘kon: katalog, savat, buyurtma va kuryer orqali yetkazib berish.
+import {place,roadKm} from './geo.mjs';
 export const shopLabels={new:'Yangi',packing:'Yig‘ilmoqda',ready:'Kuryer kutilmoqda',delivering:'Yo‘lda',delivered:'Yetkazildi',cancelled:'Bekor qilingan'};
 export const shopActive=s=>!['delivered','cancelled'].includes(s);
 export const shopNext={new:'packing',packing:'ready',delivering:'delivered'};
 const defaultCategories=[{id:'food',name:'Oziq-ovqat',emoji:'🍞'},{id:'fruit',name:'Meva va sabzavot',emoji:'🍎'},{id:'drinks',name:'Ichimliklar',emoji:'🥤'},{id:'sweets',name:'Shirinliklar',emoji:'🍰'},{id:'home',name:'Uy-ro‘zg‘or',emoji:'🧴'}];
-export function freshShop(){return {settings:{open:true,deliveryFee:10000,freeFrom:200000,minOrder:30000},categories:structuredClone(defaultCategories),products:[],orders:[],nextOrder:1001};}
+// Yetkazish narxi do‘kondan masofaga qarab: 0–3 km, 3–7 km, 7–15 km, 15 km dan uzoq.
+export const zoneLimits=[3,7,15];
+const defaultSettings=()=>({open:true,origin:'bozor',zones:[6000,12000,20000,30000],freeFrom:200000,minOrder:30000});
+export function deliveryQuote(st,placeId){const p=place(placeId),o=place(st.origin)||place('markaz');if(!p)throw Error('Yetkazish hududini tanlang.');const km=roadKm(o,p),i=zoneLimits.findIndex(l=>km<=l),z=i<0?3:i;return {km,zone:z+1,fee:st.zones[z]};}
+export function freshShop(){return {settings:defaultSettings(),categories:structuredClone(defaultCategories),products:[],orders:[],nextOrder:1001};}
 export function shopSeed(now=Date.now()){
   const P=(id,categoryId,name,price,unit,stock,emoji,desc='')=>({id,categoryId,name,price,unit,stock,emoji,desc,image:'',active:true});
   const products=[
@@ -25,24 +30,24 @@ export function shopSeed(now=Date.now()){
     P('p15','home','Idish yuvish vositasi',16000,'1 litr',0,'🧽')
   ];
   const line=(id,qty)=>{const p=products.find(p=>p.id===id);return {productId:id,name:p.name,unit:p.unit,price:p.price,qty,sum:p.price*qty};};
-  const order=(n,customer,items,status,courierId,ago)=>{const subtotal=items.reduce((a,l)=>a+l.sum,0),delivery=subtotal>=200000?0:10000;return {id:`DK-${n}`,customerId:'demo-customer-other',customer,phone:'+998900000005',address:'Qumqo‘rg‘on sh., Navro‘z ko‘chasi, 12-uy',comment:'',items,subtotal,delivery,total:subtotal+delivery,payment:'cash',status,courierId,createdAt:now-ago,...(status==='delivered'?{deliveredAt:now-ago+1800000}:{})};};
-  return {settings:{open:true,deliveryFee:10000,freeFrom:200000,minOrder:30000},categories:structuredClone(defaultCategories),products,orders:[
-    order(1006,'Nilufar K.',[line('p2',2),line('p3',1),line('p4',1)],'new',null,240000),
-    order(1005,'Bobur T.',[line('p12',1),line('p11',1)],'ready',null,1500000),
-    order(1004,'Sevara M.',[line('p6',3),line('p9',2),line('p1',4)],'delivered','d2',7200000),
-    order(1003,'Otabek R.',[line('p14',1),line('p10',6)],'delivered','d4',30000000),
-    order(1002,'Dilnoza A.',[line('p5',2),line('p1',3),line('p13',1)],'delivered','d1',90000000)
+  const order=(n,customer,items,status,courierId,ago,placeId)=>{const subtotal=items.reduce((a,l)=>a+l.sum,0),delivery=subtotal>=200000?0:deliveryQuote(defaultSettings(),placeId).fee;return {id:`DK-${n}`,customerId:'demo-customer-other',customer,phone:'+998900000005',placeId,area:place(placeId).name,address:'Navro‘z ko‘chasi, 12-uy',comment:'',items,subtotal,delivery,total:subtotal+delivery,payment:'cash',status,courierId,createdAt:now-ago,...(status==='delivered'?{deliveredAt:now-ago+1800000}:{})};};
+  return {settings:defaultSettings(),categories:structuredClone(defaultCategories),products,orders:[
+    order(1006,'Nilufar K.',[line('p2',2),line('p3',1),line('p4',1)],'new',null,240000,'yangishahar'),
+    order(1005,'Bobur T.',[line('p12',1),line('p11',1)],'ready',null,1500000,'hurriyat'),
+    order(1004,'Sevara M.',[line('p6',3),line('p9',2),line('p1',4)],'delivered','d2',7200000,'navbahor'),
+    order(1003,'Otabek R.',[line('p14',1),line('p10',6)],'delivered','d4',30000000,'saxovat'),
+    order(1002,'Dilnoza A.',[line('p5',2),line('p1',3),line('p13',1)],'delivered','d1',90000000,'bogara')
   ],nextOrder:1007};
 }
-export function upgradeShop(s){if(!s.shop)s.shop=freshShop();return s;}
+export function upgradeShop(s){if(!s.shop)s.shop=freshShop();else if(!Array.isArray(s.shop.settings?.zones)){const o=s.shop.settings||{};s.shop={...s.shop,settings:{...defaultSettings(),open:o.open??true,freeFrom:o.freeFrom??200000,minOrder:o.minOrder??30000}};}return s;}
 const int=(v,min,max,msg)=>{const n=Number(v);if(!Number.isInteger(n)||n<min||n>max)throw Error(msg);return n;};
-export function cartTotals(shop,items){
+export function cartTotals(shop,items,placeId){
   if(!Array.isArray(items)||!items.length||items.length>50)throw Error('Savat bo‘sh.');
   const merged=new Map();
   for(const it of items){if(!it||typeof it.id!=='string')throw Error('Savatdagi mahsulot noto‘g‘ri.');merged.set(it.id,(merged.get(it.id)||0)+int(it.qty,1,99,'Mahsulot soni 1 dan 99 gacha bo‘lsin.'));}
   const lines=[...merged].map(([id,qty])=>{const p=shop.products.find(p=>p.id===id);if(!p||!p.active)throw Error('Savatdagi ba’zi mahsulotlar endi sotuvda yo‘q.');if(p.stock<qty)throw Error(`«${p.name}» omborda ${p.stock} ta qoldi.`);return {productId:p.id,name:p.name,unit:p.unit,price:p.price,qty,sum:p.price*qty};});
-  const subtotal=lines.reduce((a,l)=>a+l.sum,0),st=shop.settings,delivery=st.freeFrom>0&&subtotal>=st.freeFrom?0:st.deliveryFee;
-  return {lines,subtotal,delivery,total:subtotal+delivery};
+  const subtotal=lines.reduce((a,l)=>a+l.sum,0),st=shop.settings,dq=deliveryQuote(st,placeId),delivery=st.freeFrom>0&&subtotal>=st.freeFrom?0:dq.fee;
+  return {lines,subtotal,delivery,total:subtotal+delivery,km:dq.km,zone:dq.zone};
 }
 const imageOk=v=>v===''||/^\/images\/[a-f0-9]{24}\.(jpg|png|webp)$/.test(v)||(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v)&&v.length<=400000);
 function restock(shop,o){for(const l of o.items){const p=shop.products.find(p=>p.id===l.productId);if(p)p.stock+=l.qty;}}
@@ -53,9 +58,9 @@ export function shopAction(s,user,action,p,h){
   if(action==='shop.checkout'){
     check(user.role==='rider','Buyurtmani mijoz hisobidan bering.');check(shop.settings.open,'Do‘kon hozir yopiq. Keyinroq urinib ko‘ring.');
     check(shop.orders.filter(o=>o.customerId===user.id&&shopActive(o.status)).length<3,'Sizda 3 ta yakunlanmagan buyurtma bor.');
-    const t=cartTotals(shop,p.items);check(t.subtotal>=shop.settings.minOrder,`Eng kam buyurtma: ${shop.settings.minOrder} so‘m.`);
+    const t=cartTotals(shop,p.items,p.placeId);check(t.subtotal>=shop.settings.minOrder,`Eng kam buyurtma: ${shop.settings.minOrder} so‘m.`);
     for(const l of t.lines)shop.products.find(x=>x.id===l.productId).stock-=l.qty;
-    shop.orders.unshift({id:`DK-${shop.nextOrder++}`,customerId:user.id,customer:user.name,phone:user.phone,address:text(p.address,'Manzil',160),comment:opt(p.comment,'Izoh',200),items:t.lines,subtotal:t.subtotal,delivery:t.delivery,total:t.total,payment:'cash',status:'new',courierId:null,createdAt:Date.now()});
+    shop.orders.unshift({id:`DK-${shop.nextOrder++}`,customerId:user.id,customer:user.name,phone:user.phone,placeId:p.placeId,area:place(p.placeId).name,address:text(p.address,'Manzil',160),comment:opt(p.comment,'Izoh',200),items:t.lines,subtotal:t.subtotal,delivery:t.delivery,total:t.total,payment:'cash',status:'new',courierId:null,createdAt:Date.now()});
   } else if(action==='shop.assign'){
     check(admin||user.role==='driver');const o=shop.orders.find(o=>o.id===p.id),d=s.drivers.find(d=>d.id===(admin?p.driverId:user.driverId));
     check(o?.status==='ready','Buyurtma hali tayyor emas yoki boshqa kuryer olgan.');
@@ -83,7 +88,7 @@ export function shopAction(s,user,action,p,h){
     check(admin);check(!shop.products.some(x=>x.categoryId===p.id),'Avval bu kategoriyadagi mahsulotlarni boshqasiga o‘tkazing yoki o‘chiring.');
     const i=shop.categories.findIndex(c=>c.id===p.id);check(i>=0,'Kategoriya topilmadi.');shop.categories.splice(i,1);
   } else if(action==='shop.settings.save'){
-    check(admin);shop.settings={open:p.open===true||p.open==='on'||p.open==='true',deliveryFee:int(p.deliveryFee,0,1000000,'Yetkazish narxini tekshiring.'),freeFrom:int(p.freeFrom,0,1000000000,'Bepul yetkazish chegarasini tekshiring.'),minOrder:int(p.minOrder,0,1000000000,'Eng kam buyurtma summasini tekshiring.')};
+    check(admin);check(!!place(p.origin),'Do‘kon joylashuvini tanlang.');shop.settings={open:p.open===true||p.open==='on'||p.open==='true',origin:p.origin,zones:[1,2,3,4].map(i=>int(p['zone'+i],0,1000000,'Yetkazish narxlarini tekshiring.')),freeFrom:int(p.freeFrom,0,1000000000,'Bepul yetkazish chegarasini tekshiring.'),minOrder:int(p.minOrder,0,1000000000,'Eng kam buyurtma summasini tekshiring.')};
   } else throw Error('Noma’lum amal.');
 }
 export function shopVisible(s,u){

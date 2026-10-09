@@ -1,0 +1,5 @@
+data/
+android/build/
+*.apk
+*.idsig
+*.jks

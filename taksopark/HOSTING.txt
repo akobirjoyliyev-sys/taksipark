@@ -1,0 +1,35 @@
+HOSTINGGA JOYLASHTIRISH
+
+1. ZIPni oching. Ichida taksopark papkasi bor.
+2. Hosting Node.js 24 yoki Docker qo'llashi shart. Faqat PHP/static hosting yetmaydi.
+
+AGAR HOSTING PANELIDA NODE.JS BO'LSA:
+- Ilova papkasi: taksopark
+- Node.js versiyasi: 24 yoki yangi
+- Startup file: server.mjs
+- Start command: node server.mjs
+- Environment: HOST=0.0.0.0
+- PORT: hosting bergan qiymat (bo'lmasa 4317)
+- ADMIN_PHONE: o'zingizning +998 telefoningiz
+- data papkasi yozish mumkin bo'lgan va qayta deployda saqlanadigan joyda bo'lsin.
+- Hosting panelidan domen/subdomenni ilovaga ulang va SSL/HTTPSni yoqing.
+- Ilovani ishga tushiring. Admin login/parol data/first-login.txt ichida paydo bo'ladi.
+
+AGAR VPS + DOCKER BO'LSA:
+- README.md faylidagi qisqa buyruqlarni bajaring.
+- .env.example nusxasini .env deb saqlang va DOMAIN ni kiriting.
+- docker compose up -d --build
+- docker compose exec app cat /app/data/first-login.txt
+
+DOMEN:
+myxvest.ru sizning domeningiz bo'lsa, mavjud saytga tegmaslik uchun
+taxi.myxvest.ru kabi alohida subdomen yarating va unga ilovani ulang.
+Bu subdomen hozir avtomatik yaratilmagan; DNS va hostingda o'zingiz sozlaysiz.
+
+TELEFON:
+HTTPS server ishga tushgandan keyin APKdagi Server manzili maydoniga
+o'zingiz sozlagan to'liq https:// manzilini kiriting. Oxiriga /api qo'shmang.
+Keyin tekshirish va saqlash tugmasini bosing.
+
+Bu boshlang'ich versiya. Haqiqiy GPS, SMS, Click/Payme va push ulanmagan.
+Xarita hamda manzillar hozir Toshkent uchun demo. Batafsil: README.md.

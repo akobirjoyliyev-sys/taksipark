@@ -1,3 +1,4 @@
+// NAVO TAXI — © 2026 Akobir Joyliyev. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
 package uz.navo.taksopark;
 
 import android.app.Activity;

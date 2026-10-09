@@ -1,3 +1,4 @@
+// NAVO TAXI — © 2026 Akobir Joyliyev. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
 import http from 'node:http';
 import {DatabaseSync} from 'node:sqlite';
 import {scryptSync,randomBytes,timingSafeEqual,createHash} from 'node:crypto';

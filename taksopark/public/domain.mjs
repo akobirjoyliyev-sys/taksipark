@@ -1,3 +1,4 @@
+// NAVO TAXI — © 2026 Akobir Joyliyev. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
 export const places = [
   {id:'amir',name:'Amir Temur xiyoboni',area:'Yunusobod tumani',x:60,y:44,lat:41.3111,lon:69.2797},
   {id:'city',name:'Tashkent City',area:'Shayxontohur tumani',x:29,y:48,lat:41.3167,lon:69.2480},
@@ -27,7 +28,7 @@ export function seed(){
     {id:'d3',name:'Dilshod Umarov',phone:'+998901110103',car:'Chevrolet Gentra',plate:'01 C 909 AC',online:false,blocked:false,rating:4.9},
     {id:'d4',name:'Javohir Akbarov',phone:'+998901110104',car:'BYD Chazor',plate:'01 D 505 AD',online:true,blocked:false,rating:5.0}
   ];
-  return {settings:{name:'NAVO',city:'Toshkent',phone:'+998 71 000 00 00',commission:12},tariffs:[{id:'economy',name:'Ekonom',base:5000,perKm:1800,desc:'Har kun uchun qulay'},{id:'comfort',name:'Komfort',base:7000,perKm:2400,desc:'Kengroq, qulayroq'},{id:'business',name:'Biznes',base:12000,perKm:3500,desc:'Yuqori darajadagi safar'}],drivers,orders:[
+  return {settings:{name:'NAVO TAXI',city:'Toshkent',phone:'+998 71 000 00 00',commission:12},tariffs:[{id:'economy',name:'Ekonom',base:5000,perKm:1800,desc:'Har kun uchun qulay'},{id:'comfort',name:'Komfort',base:7000,perKm:2400,desc:'Kengroq, qulayroq'},{id:'business',name:'Biznes',base:12000,perKm:3500,desc:'Yuqori darajadagi safar'}],drivers,orders:[
     {id:'NV-1048',riderId:'demo-rider-other',rider:'Madina R.',phone:'+998900000001',from:'city',to:'airport',tariff:'comfort',price:29500,km:9.2,minutes:28,status:'pending',driverId:null,createdAt:now-90000,commission:12},
     {id:'NV-1047',riderId:'demo-rider-other',rider:'Jasur A.',phone:'+998900000002',from:'chorsu',to:'amir',tariff:'economy',price:17000,km:6.4,minutes:19,status:'riding',driverId:'d2',createdAt:now-1200000,commission:12},
     ...Array.from({length:18},(_,i)=>({id:`NV-${1046-i}`,riderId:'history',rider:['Malika S.','Akmal T.','Shahzod B.'][i%3],phone:'+998900000000',from:places[i%8].id,to:places[(i+3)%8].id,tariff:['economy','comfort','business'][i%3],price:15000+(i%7)*3500,km:4.5+i%6,minutes:15+i,status:'completed',driverId:drivers[i%4].id,createdAt:now-i*3600000-2400000,completedAt:now-i*3600000-600000,commission:12}))

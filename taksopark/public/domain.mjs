@@ -1,4 +1,4 @@
-// NAVO TAXI — © 2026 Akobir Joyliyev. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
+// NAVO TAXI — © 2026 Jovliyev Akobir Olimjon o‘g‘li. Barcha huquqlar himoyalangan. Ruxsatsiz nusxalash, tarqatish va sotish taqiqlanadi.
 export const places = [
   {id:'amir',name:'Amir Temur xiyoboni',area:'Yunusobod tumani',x:60,y:44,lat:41.3111,lon:69.2797},
   {id:'city',name:'Tashkent City',area:'Shayxontohur tumani',x:29,y:48,lat:41.3167,lon:69.2480},

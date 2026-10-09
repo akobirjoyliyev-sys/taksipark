@@ -1,6 +1,6 @@
 # NAVO TAXI — Taksopark — Android APK, admin paneli va server
 
-**Muallif va egasi:** Akobir Joyliyev · © 2026 · Barcha huquqlar himoyalangan. Foydalanish shartlari: [LICENSE](LICENSE).
+**Muallif va egasi:** Jovliyev Akobir Olimjon o‘g‘li · © 2026 · Barcha huquqlar himoyalangan. Foydalanish shartlari: [LICENSE](LICENSE).
 
 **v0.1: ishlaydigan boshlang‘ich versiya. Ishlab chiqarish darajasidagi yakuniy taksi tizimi emas.**
 

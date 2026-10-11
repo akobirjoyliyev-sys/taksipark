@@ -1,0 +1,1729 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tayyor Telegram botlar — JOVLIYEV</title>
+  <meta name="description" content="Biznes uchun tayyor Telegram botlar. 5 daqiqada ishga tushadi.">
+  <meta name="theme-color" content="#060810">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       TOKENS
+    ============================================================ */
+    :root {
+      --bg:       #060810;
+      --bg2:      #090c17;
+      --surface:  rgba(255,255,255,.04);
+      --surfaceh: rgba(255,255,255,.07);
+      --border:   rgba(255,255,255,.08);
+      --borderh:  rgba(255,255,255,.18);
+
+      --lime:     #c8ff00;
+      --lime10:   rgba(200,255,0,.10);
+      --lime20:   rgba(200,255,0,.20);
+      --lime-glow:rgba(200,255,0,.30);
+
+      --white:  #eef0ff;
+      --muted:  rgba(238,240,255,.48);
+      --subtle: rgba(238,240,255,.24);
+
+      --ff-d: 'Syne', sans-serif;
+      --ff-b: 'Inter', sans-serif;
+
+      --ease:  cubic-bezier(.16,1,.3,1);
+      --r:     18px;
+      --r-lg:  28px;
+    }
+
+    /* ============================================================
+       RESET
+    ============================================================ */
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family: var(--ff-b);
+      background: var(--bg);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color:inherit; text-decoration:none; }
+    img { max-width:100%; display:block; }
+
+    /* ============================================================
+       NOISE TEXTURE
+    ============================================================ */
+    body::after {
+      content:'';
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:9998;
+      opacity:.022;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ============================================================
+       CUSTOM CURSOR  (hidden on touch)
+    ============================================================ */
+    .cur,
+    .cur-ring {
+      position:fixed;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:9999;
+      transform:translate(-50%,-50%);
+    }
+    .cur {
+      width:10px; height:10px;
+      background:var(--lime);
+      mix-blend-mode:difference;
+      transition:width .2s var(--ease), height .2s var(--ease);
+    }
+    .cur-ring {
+      width:34px; height:34px;
+      border:1px solid rgba(200,255,0,.4);
+      transition:transform .12s linear, border-color .25s;
+    }
+    .cur.big { width:18px; height:18px; }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .wrap {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .site-nav {
+      position:fixed;
+      top:0; left:0; right:0;
+      z-index:200;
+      padding:14px 0;
+    }
+
+    .nav-pill {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      padding:10px 18px;
+      background:rgba(6,8,16,.72);
+      border:1px solid var(--border);
+      border-radius:100px;
+      backdrop-filter:blur(24px);
+      -webkit-backdrop-filter:blur(24px);
+      transition:border-color .3s, background .3s;
+    }
+
+    .nav-pill.scrolled {
+      background:rgba(6,8,16,.92);
+      border-color:var(--borderh);
+    }
+
+    .logo {
+      font-family:var(--ff-d);
+      font-size:17px;
+      font-weight:800;
+      letter-spacing:-.04em;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+
+    .logo-pip {
+      display:inline-block;
+      width:7px; height:7px;
+      background:var(--lime);
+      border-radius:50%;
+      animation:pip-pulse 2.4s ease infinite;
+    }
+
+    @keyframes pip-pulse {
+      0%,100%{opacity:1;transform:scale(1)}
+      50%{opacity:.5;transform:scale(.65)}
+    }
+
+    .nav-links {
+      display:flex; align-items:center;
+      gap:28px; list-style:none;
+      font-size:13px; color:var(--muted);
+    }
+
+    .nav-links a {
+      transition:color .2s;
+      position:relative;
+    }
+
+    .nav-links a::after {
+      content:'';
+      position:absolute;
+      left:0; bottom:-2px;
+      height:1px; width:0;
+      background:var(--lime);
+      transition:width .3s var(--ease);
+    }
+
+    .nav-links a:hover { color:var(--white); }
+    .nav-links a:hover::after { width:100%; }
+
+    .nav-cta {
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:9px 20px;
+      background:var(--lime);
+      color:#060810;
+      border-radius:100px;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:-.01em;
+      transition:all .25s var(--ease);
+      white-space:nowrap;
+    }
+    .nav-cta:hover { background:#d7ff26; transform:scale(1.04); }
+
+    /* ============================================================
+       SECTION LABEL  (eyebrow)
+    ============================================================ */
+    .label {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-size:10.5px;
+      font-weight:600;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--lime);
+      margin-bottom:18px;
+    }
+    .label::before {
+      content:'';
+      display:block;
+      width:22px; height:1px;
+      background:var(--lime);
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn-lime {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:15px 28px;
+      background:var(--lime);
+      color:#060810;
+      border-radius:100px;
+      font-family:var(--ff-d);
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:-.01em;
+      transition:all .3s var(--ease);
+      position:relative;
+      overflow:hidden;
+    }
+    .btn-lime::before {
+      content:'';
+      position:absolute;
+      inset:0;
+      background:rgba(255,255,255,.28);
+      transform:scaleX(0);
+      transform-origin:left;
+      transition:transform .4s var(--ease);
+    }
+    .btn-lime:hover { transform:translateY(-3px); box-shadow:0 20px 50px var(--lime-glow); }
+    .btn-lime:hover::before { transform:scaleX(1); }
+
+    .btn-outline {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:15px 28px;
+      color:var(--white);
+      border:1px solid var(--borderh);
+      border-radius:100px;
+      font-size:14px;
+      font-weight:500;
+      transition:all .3s var(--ease);
+    }
+    .btn-outline:hover {
+      border-color:var(--lime20);
+      background:var(--lime10);
+      color:var(--lime);
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      min-height:100svh;
+      padding:120px 0 80px;
+      display:flex;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* ambient glow */
+    .hero::before {
+      content:'';
+      position:absolute;
+      top:-100px; right:-80px;
+      width:700px; height:700px;
+      background:radial-gradient(circle, rgba(200,255,0,.07) 0%, transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      align-items:center;
+      gap:60px;
+    }
+
+    /* BIG background word */
+    .hero-word {
+      position:absolute;
+      bottom:-30px; right:-15px;
+      font-family:var(--ff-d);
+      font-size:clamp(120px,18vw,260px);
+      font-weight:800;
+      color:transparent;
+      -webkit-text-stroke:1px rgba(255,255,255,.04);
+      pointer-events:none;
+      user-select:none;
+      line-height:1;
+      will-change:transform;
+    }
+
+    .hero-left { position:relative; z-index:1; }
+
+    .hero-title {
+      font-family:var(--ff-d);
+      font-size:clamp(54px,6vw,92px);
+      font-weight:800;
+      line-height:.94;
+      letter-spacing:-.05em;
+      margin-bottom:24px;
+    }
+
+    .hero-title em {
+      font-style:normal;
+      color:var(--lime);
+    }
+
+    .hero-desc {
+      font-size:16px;
+      color:var(--muted);
+      line-height:1.78;
+      max-width:470px;
+      margin-bottom:36px;
+    }
+
+    .hero-actions {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .hero-stats {
+      display:flex;
+      align-items:center;
+      gap:28px;
+      margin-top:48px;
+      padding-top:28px;
+      border-top:1px solid var(--border);
+    }
+
+    .stat-val {
+      font-family:var(--ff-d);
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:-.04em;
+      line-height:1;
+      color:var(--white);
+    }
+    .stat-val sup { color:var(--lime); font-size:.6em; vertical-align:super; }
+
+    .stat-lbl {
+      font-size:11px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .stat-sep {
+      width:1px; height:32px;
+      background:var(--border);
+    }
+
+    /* ============================================================
+       PHONE MOCKUP
+    ============================================================ */
+    .hero-right {
+      position:relative;
+      z-index:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .mockup-scene {
+      position:relative;
+      width:100%;
+      max-width:420px;
+    }
+
+    .phone {
+      width:264px;
+      margin:0 auto;
+      position:relative;
+      z-index:2;
+    }
+
+    .phone-shell {
+      background:#10141f;
+      border:1.5px solid rgba(255,255,255,.1);
+      border-radius:44px;
+      padding:10px;
+      box-shadow:
+        0 70px 140px rgba(0,0,0,.75),
+        inset 0 1px 0 rgba(255,255,255,.07),
+        0 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .phone-notch {
+      width:72px; height:8px;
+      background:#0a0d1a;
+      border-radius:0 0 14px 14px;
+      margin:0 auto 10px;
+    }
+
+    .phone-screen {
+      background:#111827;
+      border-radius:34px;
+      overflow:hidden;
+      min-height:460px;
+    }
+
+    .tg-top {
+      background:#1a2340;
+      padding:13px 15px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+
+    .tg-av {
+      width:34px; height:34px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--lime),#00d4cc);
+      display:grid;
+      place-items:center;
+      font-size:16px;
+      flex-shrink:0;
+    }
+
+    .tg-name { font-size:13px; font-weight:600; color:#fff; }
+    .tg-sub  { font-size:10px; color:var(--lime); }
+
+    .tg-chat {
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .msg {
+      max-width:80%;
+      padding:9px 13px;
+      border-radius:16px;
+      font-size:11.5px;
+      line-height:1.5;
+      opacity:0;
+      animation:msg-pop .4s var(--ease) forwards;
+    }
+
+    @keyframes msg-pop {
+      from { opacity:0; transform:translateY(8px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .msg.bot {
+      background:#1e2d50;
+      color:rgba(255,255,255,.88);
+      align-self:flex-start;
+      border-bottom-left-radius:4px;
+    }
+    .msg.user {
+      background:var(--lime);
+      color:#060810;
+      align-self:flex-end;
+      border-bottom-right-radius:4px;
+      font-weight:500;
+    }
+
+    .tg-btns {
+      margin-top:6px;
+      display:grid;
+      gap:5px;
+    }
+
+    .tg-btn {
+      padding:9px 12px;
+      background:rgba(200,255,0,.1);
+      border:1px solid rgba(200,255,0,.18);
+      border-radius:10px;
+      color:var(--lime);
+      font-size:11px;
+      text-align:center;
+      font-weight:500;
+    }
+
+    /* Floating notification cards */
+    .fcard {
+      position:absolute;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 14px;
+      background:rgba(16,20,31,.97);
+      border:1px solid var(--border);
+      border-radius:14px;
+      backdrop-filter:blur(20px);
+      font-size:12px;
+      white-space:nowrap;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+    }
+
+    .fcard-ico {
+      width:30px; height:30px;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      font-size:15px;
+      flex-shrink:0;
+    }
+
+    .fcard-name { font-weight:600; color:var(--white); font-size:11.5px; }
+    .fcard-sub  { font-size:10px; color:var(--muted); margin-top:1px; }
+
+    .fcard-1 {
+      top:14%;
+      right:-28px;
+      animation:fl1 6s ease-in-out infinite;
+    }
+    .fcard-2 {
+      bottom:22%;
+      left:-36px;
+      animation:fl2 5.5s ease-in-out infinite;
+    }
+    .fcard-3 {
+      top:47%;
+      right:-44px;
+      animation:fl1 7s ease-in-out infinite reverse;
+    }
+
+    @keyframes fl1 {
+      0%,100%{ transform:translateY(0) rotate(0deg); }
+      50%    { transform:translateY(-13px) rotate(.4deg); }
+    }
+    @keyframes fl2 {
+      0%,100%{ transform:translateY(0); }
+      50%    { transform:translateY(11px) rotate(-.3deg); }
+    }
+
+    /* ============================================================
+       TICKER
+    ============================================================ */
+    .ticker-bar {
+      overflow:hidden;
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      background:var(--bg2);
+      padding:14px 0;
+    }
+
+    .ticker-track {
+      display:flex;
+      gap:56px;
+      width:max-content;
+      animation:tick 20s linear infinite;
+    }
+
+    .ticker-track span {
+      font-family:var(--ff-d);
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:22px;
+    }
+
+    .ticker-track span::after {
+      content:'✦';
+      color:var(--lime);
+      font-size:9px;
+    }
+
+    @keyframes tick {
+      from { transform:translateX(0); }
+      to   { transform:translateX(-50%); }
+    }
+
+    /* ============================================================
+       BOT CATALOG
+    ============================================================ */
+    .section { padding:90px 0; }
+    .section + .section,
+    .section-first { border-top:1px solid var(--border); }
+
+    .sec-head { margin-bottom:52px; }
+
+    .sec-title {
+      font-family:var(--ff-d);
+      font-size:clamp(36px,4vw,58px);
+      font-weight:800;
+      letter-spacing:-.05em;
+      line-height:.96;
+    }
+
+    .sec-desc {
+      font-size:15px;
+      color:var(--muted);
+      margin-top:14px;
+      max-width:520px;
+      line-height:1.72;
+    }
+
+    /* Grid bordered layout */
+    .bento {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+      border-radius:var(--r-lg);
+      overflow:hidden;
+    }
+
+    /* Per-card accent variables */
+    .pcard[data-a="ff"] { --ac:#ff6b35; --ac10:rgba(255,107,53,.10); }
+    .pcard[data-a="st"] { --ac:#fbbf24; --ac10:rgba(251,191,36,.10); }
+    .pcard[data-a="sm"] { --ac:#a78bfa; --ac10:rgba(167,139,250,.10); }
+    .pcard[data-a="kn"] { --ac:#38bdf8; --ac10:rgba(56,189,248,.10); }
+
+    .pcard {
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      padding:34px;
+      background:var(--bg);
+      overflow:hidden;
+      transition:background .3s var(--ease);
+      perspective:800px;
+    }
+
+    /* Top accent line */
+    .pcard::before {
+      content:'';
+      position:absolute;
+      top:0; left:0; right:0;
+      height:1px;
+      background:var(--ac);
+      opacity:0;
+      transition:opacity .35s;
+    }
+
+    /* Glow layer */
+    .pcard::after {
+      content:'';
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition:opacity .35s;
+      pointer-events:none;
+    }
+
+    .pcard[data-a="ff"]::after { background:radial-gradient(ellipse at 30% 0%,rgba(255,107,53,.07),transparent 60%); }
+    .pcard[data-a="st"]::after { background:radial-gradient(ellipse at 30% 0%,rgba(251,191,36,.07),transparent 60%); }
+    .pcard[data-a="sm"]::after { background:radial-gradient(ellipse at 30% 0%,rgba(167,139,250,.07),transparent 60%); }
+    .pcard[data-a="kn"]::after { background:radial-gradient(ellipse at 30% 0%,rgba(56,189,248,.07),transparent 60%); }
+
+    .pcard:hover { background:rgba(255,255,255,.022); }
+    .pcard:hover::before { opacity:1; }
+    .pcard:hover::after  { opacity:1; }
+
+    .pcard-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom:24px;
+    }
+
+    .pcard-ico {
+      width:60px; height:60px;
+      border-radius:16px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      transition:border-color .3s, transform .3s var(--ease);
+    }
+    .pcard:hover .pcard-ico {
+      border-color:var(--ac);
+      transform:scale(1.06);
+    }
+
+    .pcard-tag {
+      font-size:9.5px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--ac);
+      background:var(--ac10);
+      border:1px solid currentColor;
+      border-radius:100px;
+      padding:4px 10px;
+      opacity:.8;
+    }
+
+    .pcard-img {
+      width:100%;
+      height:130px;
+      object-fit:cover;
+      border-radius:12px;
+      margin-bottom:20px;
+      border:1px solid var(--border);
+      transition:filter .3s, transform .35s var(--ease);
+    }
+    .pcard:hover .pcard-img {
+      filter:brightness(1.08) saturate(1.1);
+      transform:scale(1.015);
+    }
+
+    .pcard-cat {
+      font-size:10.5px;
+      font-weight:600;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--ac);
+      margin-bottom:8px;
+    }
+
+    .pcard-title {
+      font-family:var(--ff-d);
+      font-size:22px;
+      font-weight:700;
+      letter-spacing:-.035em;
+      margin-bottom:10px;
+    }
+
+    .pcard-desc {
+      font-size:13.5px;
+      color:var(--muted);
+      line-height:1.72;
+      flex:1;
+    }
+
+    .pcard-foot {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:24px;
+      padding-top:18px;
+      border-top:1px solid var(--border);
+    }
+
+    .pcard-price b {
+      font-family:var(--ff-d);
+      font-size:20px;
+      font-weight:700;
+      color:var(--ac);
+      letter-spacing:-.03em;
+    }
+    .pcard-price span {
+      font-size:11px;
+      color:var(--muted);
+      margin-left:4px;
+    }
+
+    .pcard-arr {
+      width:38px; height:38px;
+      border-radius:50%;
+      border:1px solid var(--border);
+      display:grid;
+      place-items:center;
+      color:var(--muted);
+      font-size:14px;
+      transition:all .3s var(--ease);
+    }
+    .pcard:hover .pcard-arr {
+      background:var(--ac);
+      color:#060810;
+      border-color:var(--ac);
+      transform:rotate(45deg);
+    }
+
+    /* ============================================================
+       HOW IT WORKS
+    ============================================================ */
+    .how-section {
+      background:var(--bg2);
+    }
+
+    .how-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+      border-radius:var(--r-lg);
+      overflow:hidden;
+    }
+
+    .step {
+      padding:34px;
+      background:var(--bg2);
+      position:relative;
+    }
+
+    .step-n {
+      font-family:var(--ff-d);
+      font-size:72px;
+      font-weight:800;
+      letter-spacing:-.06em;
+      line-height:1;
+      color:transparent;
+      -webkit-text-stroke:1px rgba(255,255,255,.06);
+      margin-bottom:20px;
+      user-select:none;
+    }
+
+    .step-title {
+      font-family:var(--ff-d);
+      font-size:18px;
+      font-weight:700;
+      letter-spacing:-.03em;
+      margin-bottom:10px;
+    }
+
+    .step-desc {
+      font-size:13.5px;
+      color:var(--muted);
+      line-height:1.75;
+    }
+
+    code {
+      background:var(--lime10);
+      color:var(--lime);
+      padding:2px 7px;
+      border-radius:6px;
+      font-size:.9em;
+    }
+
+    /* ============================================================
+       TRUST
+    ============================================================ */
+    .trust-cols {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:60px;
+      align-items:start;
+    }
+
+    .trust-list {
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+
+    .trust-row {
+      display:flex;
+      align-items:flex-start;
+      gap:15px;
+      padding:20px 22px;
+      background:var(--bg);
+      transition:background .2s;
+    }
+    .trust-row:hover { background:var(--surfaceh); }
+
+    .trust-ico {
+      width:38px; height:38px;
+      border-radius:11px;
+      background:var(--lime10);
+      border:1px solid var(--lime20);
+      display:grid;
+      place-items:center;
+      font-size:17px;
+      flex-shrink:0;
+    }
+
+    .trust-row b {
+      display:block;
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:3px;
+    }
+
+    .trust-row p {
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.62;
+    }
+
+    .tstat-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1px;
+      background:var(--border);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+
+    .tstat {
+      padding:28px;
+      background:var(--bg);
+    }
+
+    .tstat-val {
+      font-family:var(--ff-d);
+      font-size:40px;
+      font-weight:800;
+      letter-spacing:-.06em;
+      line-height:1;
+      color:var(--lime);
+    }
+
+    .tstat-lbl {
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    /* ============================================================
+       ABOUT
+    ============================================================ */
+    .about-cols {
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:56px;
+      align-items:center;
+    }
+
+    .av-wrap {
+      position:relative;
+      flex-shrink:0;
+    }
+
+    .avatar {
+      width:148px; height:148px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--lime),#00d4aa);
+      display:grid;
+      place-items:center;
+      font-family:var(--ff-d);
+      font-size:38px;
+      font-weight:800;
+      color:#060810;
+      position:relative;
+      z-index:1;
+    }
+
+    /* spinning dashed ring */
+    .av-ring {
+      position:absolute;
+      inset:-14px;
+      border-radius:50%;
+      border:1px dashed rgba(200,255,0,.28);
+      animation:spin-ring 14s linear infinite;
+    }
+
+    /* ring dot */
+    .av-ring::before {
+      content:'';
+      position:absolute;
+      top:50%; left:-4px;
+      width:8px; height:8px;
+      background:var(--lime);
+      border-radius:50%;
+      transform:translateY(-50%);
+    }
+
+    @keyframes spin-ring {
+      from { transform:rotate(0deg); }
+      to   { transform:rotate(360deg); }
+    }
+
+    .about-name {
+      font-family:var(--ff-d);
+      font-size:clamp(34px,4vw,52px);
+      font-weight:800;
+      letter-spacing:-.05em;
+      line-height:.96;
+      margin-bottom:18px;
+    }
+
+    .about-desc {
+      font-size:15px;
+      color:var(--muted);
+      line-height:1.76;
+      max-width:540px;
+      margin-bottom:26px;
+    }
+
+    .contact-chips {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .chip {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 18px;
+      border:1px solid var(--borderh);
+      border-radius:100px;
+      font-size:13px;
+      font-weight:500;
+      transition:all .25s var(--ease);
+    }
+    .chip:hover {
+      border-color:var(--lime20);
+      background:var(--lime10);
+      color:var(--lime);
+    }
+
+    /* ============================================================
+       BIG CTA
+    ============================================================ */
+    .cta-wrap {
+      text-align:center;
+      position:relative;
+    }
+
+    .cta-glow {
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:580px; height:280px;
+      background:radial-gradient(ellipse,rgba(200,255,0,.065) 0%,transparent 70%);
+      pointer-events:none;
+    }
+
+    .cta-title {
+      font-family:var(--ff-d);
+      font-size:clamp(44px,6vw,82px);
+      font-weight:800;
+      letter-spacing:-.055em;
+      line-height:.92;
+      margin-bottom:20px;
+      position:relative;
+    }
+    .cta-title em { font-style:normal; color:var(--lime); }
+
+    .cta-desc {
+      font-size:15px;
+      color:var(--muted);
+      margin-bottom:38px;
+      max-width:440px;
+      margin-left:auto;
+      margin-right:auto;
+      line-height:1.72;
+    }
+
+    .cta-btns {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .site-foot {
+      border-top:1px solid var(--border);
+      padding:24px 0;
+    }
+
+    .foot-inner {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .foot-copy {
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .foot-tg {
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      font-size:13px;
+      color:var(--muted);
+      transition:color .2s;
+    }
+    .foot-tg:hover { color:var(--lime); }
+
+    /* ============================================================
+       SCROLL REVEAL
+    ============================================================ */
+    .rev {
+      opacity:0;
+      transform:translateY(28px);
+      transition:opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .rev.in { opacity:1; transform:none; }
+    .rev.d1 { transition-delay:.1s; }
+    .rev.d2 { transition-delay:.2s; }
+    .rev.d3 { transition-delay:.3s; }
+    .rev.d4 { transition-delay:.4s; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media(max-width:960px) {
+      .hero-grid { grid-template-columns:1fr; }
+      .hero-right { display:none; }
+      .bento    { grid-template-columns:1fr; }
+      .how-grid { grid-template-columns:1fr; }
+      .trust-cols { grid-template-columns:1fr; gap:36px; }
+      .about-cols { grid-template-columns:1fr; gap:36px; }
+      .nav-links { display:none; }
+      .hero { min-height:auto; padding:100px 0 70px; }
+    }
+
+    @media(max-width:600px) {
+      .nav-cta { display:none; }
+      .hero-stats { gap:18px; flex-wrap:wrap; }
+      .stat-sep { display:none; }
+      .pcard { padding:22px; }
+      .foot-inner { flex-direction:column; gap:10px; text-align:center; }
+      .cta-btns { flex-direction:column; }
+      .btn-lime,.btn-outline { width:100%; justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor (desktop only) -->
+<div class="cur"  id="cur" aria-hidden="true"></div>
+<div class="cur-ring" id="curRing" aria-hidden="true"></div>
+
+<!-- ======================================================
+     NAVIGATION
+======================================================= -->
+<header class="site-nav" role="banner">
+  <div class="wrap">
+    <div class="nav-pill" id="navPill">
+      <a class="logo" href="./" aria-label="JOVLIYEV — bosh sahifa">
+        JOVLIYEV<span class="logo-pip" aria-hidden="true"></span>
+      </a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#bots">Botlar</a></li>
+        <li><a href="#how">Qanday ishlaydi</a></li>
+        <li><a href="#about">Men haqimda</a></li>
+      </ul>
+
+      <a class="nav-cta" href="#bots">Bot tanlash →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ======================================================
+     HERO
+======================================================= -->
+<section class="hero" aria-labelledby="hero-h1">
+  <span class="hero-word" aria-hidden="true">BOT</span>
+
+  <div class="wrap" style="width:100%">
+    <div class="hero-grid">
+
+      <!-- LEFT: text -->
+      <div class="hero-left">
+        <p class="label">Tayyor Telegram botlar</p>
+
+        <h1 class="hero-title" id="hero-h1">
+          Biznesingiz<br>
+          uchun<br>
+          <em>tayyor bot.</em>
+        </h1>
+
+        <p class="hero-desc">
+          Botni tanlang, @BotFather'dan tokenni kiriting va to'lang.
+          Server, sozlash, dasturchi — kerak emas.
+          Tizim botni o'zi yaratadi va sizga boshqaruv havolasini beradi.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn-lime" href="#bots">
+            <span>Bot tanlash</span>
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn-outline" href="https://t.me/aiqsi" target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Savol bormi?
+          </a>
+        </div>
+
+        <div class="hero-stats rev">
+          <div>
+            <div class="stat-val">4<sup>+</sup></div>
+            <div class="stat-lbl">tayyor bot</div>
+          </div>
+          <div class="stat-sep" aria-hidden="true"></div>
+          <div>
+            <div class="stat-val">5<sup>min</sup></div>
+            <div class="stat-lbl">setup vaqti</div>
+          </div>
+          <div class="stat-sep" aria-hidden="true"></div>
+          <div>
+            <div class="stat-val">24<sup>/7</sup></div>
+            <div class="stat-lbl">uptime</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: phone mockup -->
+      <div class="hero-right" aria-hidden="true">
+        <div class="mockup-scene">
+
+          <!-- Floating cards -->
+          <div class="fcard fcard-1">
+            <div class="fcard-ico" style="background:rgba(255,107,53,.14)">🍔</div>
+            <div>
+              <div class="fcard-name">Yangi buyurtma!</div>
+              <div class="fcard-sub">Burger x2 · 50,000 so'm</div>
+            </div>
+          </div>
+
+          <div class="fcard fcard-2">
+            <div class="fcard-ico" style="background:rgba(200,255,0,.12)">✅</div>
+            <div>
+              <div class="fcard-name">Bot tayyor</div>
+              <div class="fcard-sub">4 daqiqa 52 soniya</div>
+            </div>
+          </div>
+
+          <div class="fcard fcard-3">
+            <div class="fcard-ico" style="background:rgba(56,189,248,.12)">📊</div>
+            <div>
+              <div class="fcard-name">+64 obunachi</div>
+              <div class="fcard-sub">Oxirgi 7 kun</div>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="phone">
+            <div class="phone-shell">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="tg-top">
+                  <div class="tg-av">🤖</div>
+                  <div>
+                    <div class="tg-name">Menyu Bot</div>
+                    <div class="tg-sub">● Online</div>
+                  </div>
+                </div>
+                <div class="tg-chat">
+                  <div class="msg bot" style="animation-delay:.25s">
+                    Assalomu alaykum! 👋
+                    Quyidagilardan birini tanlang:
+                    <div class="tg-btns">
+                      <div class="tg-btn">🍔 Menyu ko'rish</div>
+                      <div class="tg-btn">🛒 Savatcha</div>
+                      <div class="tg-btn">📍 Yetkazish</div>
+                    </div>
+                  </div>
+                  <div class="msg user" style="animation-delay:.75s">
+                    🍔 Menyu ko'rish
+                  </div>
+                  <div class="msg bot" style="animation-delay:1.25s">
+                    Menyuimiz ✨<br><br>
+                    🍔 Burger — 25 000 so'm<br>
+                    🍕 Pizza — 45 000 so'm<br>
+                    🥤 Ichimlik — 8 000 so'm
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     TICKER
+======================================================= -->
+<div class="ticker-bar" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Fastfood bot</span>
+    <span>Stars &amp; Premium bot</span>
+    <span>SMM bot</span>
+    <span>Kino bot</span>
+    <span>5 daqiqada tayyor</span>
+    <span>Payme to'lov</span>
+    <span>Admin panel</span>
+    <span>24/7 ishlaydi</span>
+    <!-- duplicate for seamless loop -->
+    <span>Fastfood bot</span>
+    <span>Stars &amp; Premium bot</span>
+    <span>SMM bot</span>
+    <span>Kino bot</span>
+    <span>5 daqiqada tayyor</span>
+    <span>Payme to'lov</span>
+    <span>Admin panel</span>
+    <span>24/7 ishlaydi</span>
+  </div>
+</div>
+
+<!-- ======================================================
+     BOT CATALOG
+======================================================= -->
+<section id="bots" class="section section-first" aria-labelledby="bots-h2">
+  <div class="wrap">
+
+    <div class="sec-head rev">
+      <p class="label">01 / Botlar</p>
+      <h2 class="sec-title" id="bots-h2">Qaysi bot kerak?</h2>
+      <p class="sec-desc">
+        Har bir bot o'z sohasiga moslashtirilgan.
+        Tanlang, to'lang, 5 daqiqada ishga tushiring.
+      </p>
+    </div>
+
+    <div class="bento">
+
+      <!-- Fastfood -->
+      <a class="pcard rev" href="fastfood.html" data-a="ff" aria-label="Fastfood bot — batafsil">
+        <div class="pcard-head">
+          <div class="pcard-ico" aria-hidden="true">🍔</div>
+          <span class="pcard-tag">Restoran</span>
+        </div>
+        <img class="pcard-img" src="assets/img/app-menu.jpg" alt="Fastfood botining menyu sahifasi">
+        <p class="pcard-cat">Restoran · Fastfood · Kafe</p>
+        <h3 class="pcard-title">Fastfood bot</h3>
+        <p class="pcard-desc">
+          Menyu va savat, yetkazish narxi xaritadan, buyurtmalar guruhda,
+          admin panel, promokod va statistika.
+        </p>
+        <div class="pcard-foot">
+          <div class="pcard-price">
+            <b data-price-of="fastfood-bot">…</b>
+            <span>so'm</span>
+          </div>
+          <div class="pcard-arr" aria-hidden="true">↗</div>
+        </div>
+      </a>
+
+      <!-- Stars -->
+      <a class="pcard rev d1" href="stars.html" data-a="st" aria-label="Stars va Premium bot — batafsil">
+        <div class="pcard-head">
+          <div class="pcard-ico" aria-hidden="true">⭐</div>
+          <span class="pcard-tag">Do'kon</span>
+        </div>
+        <p class="pcard-cat">Stars · Premium · Do'kon</p>
+        <h3 class="pcard-title">Stars &amp; Premium bot</h3>
+        <p class="pcard-desc">
+          Mijoz hisobi, Payme va karta orqali to'ldirish, Stars va Premium
+          paketlari avtomatik yetkaziladi.
+        </p>
+        <div class="pcard-foot">
+          <div class="pcard-price">
+            <b data-price-of="stars-bot">…</b>
+            <span>so'm</span>
+          </div>
+          <div class="pcard-arr" aria-hidden="true">↗</div>
+        </div>
+      </a>
+
+      <!-- SMM -->
+      <a class="pcard rev d2" href="smm.html" data-a="sm" aria-label="SMM nakrutka bot — batafsil">
+        <div class="pcard-head">
+          <div class="pcard-ico" aria-hidden="true">📈</div>
+          <span class="pcard-tag">SMM</span>
+        </div>
+        <p class="pcard-cat">Nakrutka · SMM · Nomerlar</p>
+        <h3 class="pcard-title">Nakrutka (SMM) bot</h3>
+        <p class="pcard-desc">
+          Instagram, TikTok, YouTube va boshqa tarmoqlar uchun xizmatlar,
+          telefon nomerlar, Stars va Premium.
+        </p>
+        <div class="pcard-foot">
+          <div class="pcard-price">
+            <b data-price-of="smm-bot">…</b>
+            <span>so'm</span>
+          </div>
+          <div class="pcard-arr" aria-hidden="true">↗</div>
+        </div>
+      </a>
+
+      <!-- Kino -->
+      <a class="pcard rev d3" href="kino.html" data-a="kn" aria-label="Kino bot — batafsil">
+        <div class="pcard-head">
+          <div class="pcard-ico" aria-hidden="true">🎬</div>
+          <span class="pcard-tag">Kino</span>
+        </div>
+        <p class="pcard-cat">Kino · Serial · Kontent</p>
+        <h3 class="pcard-title">Kino bot</h3>
+        <p class="pcard-desc">
+          Kinolar kod orqali tarqatiladi, kanalga avtomatik post,
+          majburiy obuna, reklama va tarqatma xabarlar.
+        </p>
+        <div class="pcard-foot">
+          <div class="pcard-price">
+            <b data-price-of="kino-bot">…</b>
+            <span>so'm</span>
+          </div>
+          <div class="pcard-arr" aria-hidden="true">↗</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- Examples (hidden; populated by examples.js) -->
+<section id="examples" class="section" hidden>
+  <div class="wrap">
+    <p class="label">02 / Namunalar</p>
+    <h2 class="sec-title">Mijozlarimiz botlari.</h2>
+    <div id="examplesList"></div>
+  </div>
+</section>
+
+<!-- ======================================================
+     HOW IT WORKS
+======================================================= -->
+<section id="how" class="section how-section" aria-labelledby="how-h2">
+  <div class="wrap">
+
+    <div class="sec-head rev">
+      <p class="label">03 / Qanday ishlaydi</p>
+      <h2 class="sec-title" id="how-h2">Uch qadam.<br>Qolganini tizim qiladi.</h2>
+    </div>
+
+    <div class="how-grid">
+
+      <div class="step rev">
+        <div class="step-n" aria-hidden="true">01</div>
+        <h3 class="step-title">Telegramda bot oching</h3>
+        <p class="step-desc">
+          @BotFather ga yozing → <code>/newbot</code> → botga nom bering.
+          U sizga token beradi.
+        </p>
+      </div>
+
+      <div class="step rev d1">
+        <div class="step-n" aria-hidden="true">02</div>
+        <h3 class="step-title">Botni tanlab, to'lang</h3>
+        <p class="step-desc">
+          Kerakli bot sahifasida formani to'ldirasiz.
+          To'lov Payme orqali amalga oshiriladi.
+        </p>
+      </div>
+
+      <div class="step rev d2">
+        <div class="step-n" aria-hidden="true">03</div>
+        <h3 class="step-title">Bot tayyor</h3>
+        <p class="step-desc">
+          Taxminan 5 daqiqada bot ishga tushadi.
+          Boshqaruv havolasi holat sahifasida chiqadi.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     TRUST
+======================================================= -->
+<section class="section" aria-labelledby="trust-h2">
+  <div class="wrap">
+
+    <div class="trust-cols">
+
+      <div>
+        <div class="sec-head rev" style="margin-bottom:28px">
+          <p class="label">04 / Nima uchun biz</p>
+          <h2 class="sec-title" id="trust-h2">Tez.<br>Ishonchli.<br>Oddiy.</h2>
+        </div>
+
+        <div class="trust-list rev">
+          <div class="trust-row">
+            <div class="trust-ico" aria-hidden="true">⚡</div>
+            <div>
+              <b>5 daqiqada ishga tushadi</b>
+              <p>Server, SSL, domain — hammasi avtomatik. Siz faqat token kiritasiz.</p>
+            </div>
+          </div>
+          <div class="trust-row">
+            <div class="trust-ico" aria-hidden="true">🔒</div>
+            <div>
+              <b>Token faqat sizda</b>
+              <p>Botingiz faqat sizniki. Hech qanday uchinchi tomon kirishi yo'q.</p>
+            </div>
+          </div>
+          <div class="trust-row">
+            <div class="trust-ico" aria-hidden="true">💬</div>
+            <div>
+              <b>To'g'ri murojaat</b>
+              <p>Muammo chiqsa, to'g'ridan-to'g'ri men bilan gaplashasiz.</p>
+            </div>
+          </div>
+          <div class="trust-row">
+            <div class="trust-ico" aria-hidden="true">🔄</div>
+            <div>
+              <b>Doimiy yangilanadi</b>
+              <p>Telegram API o'zgarsa, botingiz ham yangilanadi. Qo'shimcha to'lovsiz.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tstat-grid rev d1">
+        <div class="tstat">
+          <div class="tstat-val">4</div>
+          <div class="tstat-lbl">tayyor bot turi</div>
+        </div>
+        <div class="tstat">
+          <div class="tstat-val">5m</div>
+          <div class="tstat-lbl">setup vaqti</div>
+        </div>
+        <div class="tstat">
+          <div class="tstat-val">24/7</div>
+          <div class="tstat-lbl">uptime kafolati</div>
+        </div>
+        <div class="tstat">
+          <div class="tstat-val">100%</div>
+          <div class="tstat-lbl">mamnuniyat</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     ABOUT
+======================================================= -->
+<section id="about" class="section" aria-labelledby="about-h2">
+  <div class="wrap">
+    <div class="about-cols rev">
+
+      <div class="av-wrap">
+        <div class="avatar" aria-label="Akobir Jovliyev initsiallari">AJ</div>
+        <div class="av-ring" aria-hidden="true"></div>
+      </div>
+
+      <div>
+        <p class="label">05 / Kim qiladi</p>
+        <h2 class="about-name" id="about-h2">
+          Salom, men<br>Akobir Jovliyev.
+        </h2>
+        <p class="about-desc">
+          Telegram botlar va biznes uchun avtomatlashtirish bilan shug'ullanaman.
+          Botlarni o'zim yozganman va har bir mijozni o'zim qo'llab-quvvatlayman.
+          Muammo bo'lsa, to'g'ridan-to'g'ri menga yozasiz.
+        </p>
+        <div class="contact-chips">
+          <a class="chip" href="https://t.me/aiqsi" target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Telegram: @aiqsi
+          </a>
+          <a class="chip" href="tel:+998910751179">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.8a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 10.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17.92z"/></svg>
+            +998 91 075 11 79
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     BIG CTA
+======================================================= -->
+<section class="section" aria-labelledby="cta-h2">
+  <div class="wrap">
+    <div class="cta-wrap rev">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <h2 class="cta-title" id="cta-h2">
+        Botingizni<br>
+        bugun <em>ishga</em><br>
+        tushiring.
+      </h2>
+      <p class="cta-desc">
+        5 daqiqa. Texnik bilim shart emas.
+        Siz faqat tokenni kiritasiz — qolganini tizim qiladi.
+      </p>
+      <div class="cta-btns">
+        <a class="btn-lime" href="#bots">
+          <span>Bot tanlash</span>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn-outline" href="https://t.me/aiqsi" target="_blank" rel="noopener noreferrer">
+          Savol bormi? Yozing ↗
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     FOOTER
+======================================================= -->
+<footer class="site-foot" role="contentinfo">
+  <div class="wrap">
+    <div class="foot-inner">
+      <span class="foot-copy">© 2026 JOVLIYEV — Tayyor Telegram botlar</span>
+      <a class="foot-tg" href="https://t.me/aiqsi" target="_blank" rel="noopener noreferrer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.277-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- External scripts (unchanged) -->
+<script src="assets/catalog.js?v=12" defer></script>
+<script src="assets/examples.js?v=12" defer></script>
+
+<script>
+/* ============================================================
+   CURSOR  (desktop only)
+============================================================ */
+(function() {
+  var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  if (isTouchDevice) {
+    document.getElementById('cur').style.display = 'none';
+    document.getElementById('curRing').style.display = 'none';
+    document.body.style.cursor = 'auto';
+    return;
+  }
+
+  var el  = document.getElementById('cur');
+  var ring = document.getElementById('curRing');
+  var mx = -200, my = -200;
+  var rx = -200, ry = -200;
+
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX; my = e.clientY;
+    el.style.left = mx + 'px';
+    el.style.top  = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.11;
+    ry += (my - ry) * 0.11;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button').forEach(function(node) {
+    node.addEventListener('mouseenter', function() { el.classList.add('big'); });
+    node.addEventListener('mouseleave', function() { el.classList.remove('big'); });
+  });
+})();
+
+/* ============================================================
+   SCROLL REVEAL
+============================================================ */
+(function() {
+  var els = document.querySelectorAll('.rev');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function(e) { e.classList.add('in'); });
+    return;
+  }
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -36px 0px' });
+  els.forEach(function(e) { obs.observe(e); });
+})();
+
+/* ============================================================
+   NAV PILL — scroll tint
+============================================================ */
+(function() {
+  var pill = document.getElementById('navPill');
+  var onScroll = function() {
+    pill.classList.toggle('scrolled', window.scrollY > 48);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* ============================================================
+   HERO WORD — subtle parallax
+============================================================ */
+(function() {
+  var word = document.querySelector('.hero-word');
+  if (!word) return;
+  window.addEventListener('scroll', function() {
+    word.style.transform = 'translateY(' + (window.scrollY * 0.28) + 'px)';
+  }, { passive: true });
+})();
+
+/* ============================================================
+   CARD 3D TILT  (desktop only)
+============================================================ */
+(function() {
+  if ('ontouchstart' in window) return;
+  document.querySelectorAll('.pcard').forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var r = card.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width  - 0.5;
+      var y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = 'translateY(-7px) rotateY(' + (x * 6) + 'deg) rotateX(' + (-y * 4) + 'deg)';
+      card.style.transition = 'transform .08s ease';
+    });
+    card.addEventListener('mouseleave', function() {
+      card.style.transform = '';
+      card.style.transition = 'transform .55s cubic-bezier(.16,1,.3,1)';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

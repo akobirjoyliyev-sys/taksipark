@@ -8,18 +8,40 @@ chcp 65001 >nul
 cd /d "%~dp0"
 title Kassa bot
 
-if exist ".env" goto env_ok
+REM Zip ichidan to'g'ridan-to'g'ri ochilgan bo'lsa, boshqa fayllar yonida bo'lmaydi.
+if exist "pyproject.toml" if exist "app\__init__.py" if exist ".env.example" goto files_ok
+echo.
+echo [X] Fayllar topilmadi. START_WINDOWS.cmd zip ichidan ochilgan bo'lishi mumkin.
+echo.
+echo     1. Zip faylga o'ng tugma - "Extract All..." - "Extract" bosing.
+echo     2. Ochilgan kassa_bot papkasiga kiring.
+echo     3. O'sha yerdagi START_WINDOWS.cmd ni ikki marta bosing.
+echo.
+echo     Hozirgi papka: %CD%
+goto end
+:files_ok
+
+if not exist ".env" goto env_new
+REM .env bor, lekin token bo'sh bo'lsa - qaytadan so'raymiz.
+findstr /b /r /c:"BOT_TOKEN=..*" ".env" >nul 2>nul
+if not errorlevel 1 goto env_ok
+del ".env"
+:env_new
 echo.
 echo === Birinchi sozlash ===
 set /p BOT_TOKEN_IN=Bot tokenini kiriting [@BotFather]: 
 set /p ADMIN_ID_IN=Admin Telegram ID [@userinfobot]: 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ErrorActionPreference = 'Stop';" ^
   "$t = Get-Content -Raw -Encoding UTF8 '.env.example';" ^
   "$t = $t -replace '(?m)^BOT_TOKEN=.*$', ('BOT_TOKEN=' + $env:BOT_TOKEN_IN.Trim());" ^
   "$t = $t -replace '(?m)^ADMIN_IDS=.*$', ('ADMIN_IDS=' + $env:ADMIN_ID_IN.Trim() + ':superadmin');" ^
   "$t = $t -replace '(?m)^BOT_USERNAME=.*$', 'BOT_USERNAME=';" ^
   "$t = $t -replace '(?m)^MOBCASH_ENABLED=.*$', 'MOBCASH_ENABLED=true';" ^
   "[IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), $t, (New-Object Text.UTF8Encoding $false))"
+if errorlevel 1 goto env_fail
+if not exist ".env" goto env_fail
+findstr /b /r /c:"BOT_TOKEN=..*" ".env" >nul 2>nul
 if errorlevel 1 goto env_fail
 echo [OK] .env yaratildi. Keyin o'zgartirish uchun: notepad .env
 :env_ok
@@ -85,6 +107,7 @@ echo.
 goto end
 
 :env_fail
+if exist ".env" del ".env"
 echo [X] .env yaratib bo'lmadi.
 :fail
 echo.

@@ -24,6 +24,8 @@ async def dashboard_text(svc: Services, admin: Admin) -> str:
     active_boxes = await svc.bookmakers.list_active()
     active_cards = await svc.p2p.active_cards()
     active_bots = await svc.userbots.active_accounts()
+    _, auto_ok, auto_amount = await svc.auto.today_summary()
+    auto_active = await svc.auto.active_batches()
     return (
         f"⚙️ <b>TIZIM BOSHQARUV PANELI</b>\n"
         f"Admin: <code>{admin.telegram_id}</code>\n"
@@ -34,8 +36,11 @@ async def dashboard_text(svc: Services, admin: Admin) -> str:
         f"• 🏦 Faol kassalar: <b>{len(active_boxes)} ta</b>\n"
         f"• 🛰 Faol userbotlar: <b>{len(active_bots)} ta</b>\n"
         f"• 💳 Faol kartalar: <b>{len(active_cards)} ta</b>\n"
-        f"• 💰 Depozit limit: {fmt_money(rt.deposit_min)} — {fmt_money(rt.deposit_max)}\n\n"
-        f"👉 Kerakli bo‘limni tanlang:"
+        f"• 💰 Depozit limit: {fmt_money(rt.deposit_min)} — {fmt_money(rt.deposit_max)}\n"
+        f"• 🤖 Avto to‘lov (24 soat): <b>{auto_ok} ID</b> • {fmt_money(auto_amount)}"
+        + (f" • ⚡ faol: {len(auto_active)}" if auto_active else "")
+        + "\n\n"
+        "👉 Kerakli bo‘limni tanlang:"
     )
 
 

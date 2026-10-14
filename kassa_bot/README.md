@@ -44,7 +44,7 @@ docs/               # API.md, DB_SCHEMA.md, CHECKLIST.md
 |----------|--------------------------------|----------------------------------------------------------------|
 | `bot`    | `python -m app.bot`            | Telegram long-polling (`BOT_MODE=polling`)                     |
 | `api`    | `uvicorn app.webhooks.app:app` | provayder webhooklari, sandbox sahifalari, Telegram webhook    |
-| `worker` | `python -m app.jobs`           | payout navbati, retry/backoff, expiry, reconciliation, hisobot |
+| `worker` | `python -m app.jobs`           | 🤖 avto to‘lov, payout navbati, retry/backoff, expiry, reconciliation, hisobot |
 | `userbot`| `python -m app.userbot`        | bank xabarlarini o‘qib P2P to‘lovlarni tasdiqlaydi (1 nusxa)   |
 | `migrate`| `alembic upgrade head && python -m app.seed` | sxema + boshlang‘ich ma’lumotlar                 |
 
@@ -148,6 +148,49 @@ Qoidalar:
 - Tarixi bor kantorani o‘chirib bo‘lmaydi — faqat 🔴 o‘chirib qo‘yiladi (eski arizalarni
   qaytarish/tekshirish uchun kerak).
 - Kantora qo‘shilmagan bo‘lsa, «🏦 Mob-Cash» dagi yagona kassa (eski rejim) ishlaydi.
+
+## 🤖 Avto to‘lov (ID lar ro‘yxatiga avtomatik o‘tkazish)
+
+Bir vaqtda 100, 300 yoki 1000 ta o‘yin ID siga pul o‘tkazish kerak bo‘lsa — har biriga qo‘lda
+kiritib o‘tirmaysiz. Bot ro‘yxatni o‘zi o‘qiydi, summani **bir marta** so‘raydi va hammasini
+o‘zi o‘tkazadi.
+
+`/admin → 🤖 Avto to‘lov → 🚀 Yangi avto to‘lov`
+
+1. **Kassa** tanlanadi (faol kantoralar; bitta bo‘lsa avtomatik). Kassa balansi ko‘rsatiladi.
+2. **ID lar** yuboriladi — bitta yoki bir nechta xabarda, yoki `.txt` / `.csv` fayl:
+   ```
+   123456789
+   987654321, 555666777 444333222
+   1) 111222333
+   ```
+   Takroriylar olib tashlanadi, tanilmagan qatorlar ko‘rsatiladi (ID — 5–15 xonali raqam).
+   Har bir ID ga alohida summa: `123456789 - 15000` (`:`, `|`, `=`, `—` ham bo‘ladi; `15k`, `15 000`).
+3. Bot so‘raydi: **«Har bir ID ga qanchadan o‘tkazilsin?»** — tugma (5 000 … 200 000) yoki yozing.
+4. **Preview**: ID lar soni, har biriga summa, jami, kassa balansi (✅ yetadi / ⚠️ yetmaydi),
+   so‘nggi 24 soatda shu kassadan pul olgan ID lar soni. Shu paytgacha hech narsa yuborilmaydi.
+5. **🚀 Boshlash → ✅ Ha** — worker har bir ID ga ketma-ket o‘tkazadi; progress xabari
+   jonli yangilanadi (▰▰▰▱▱ 42%, ✅/❌/🕵️ soni, taxminiy qolgan vaqt, oxirgi ID).
+   Yakunda CSV hisobot keladi.
+
+Boshqaruv: `⏸ Pauza`, `▶️ Davom ettirish`, `⛔ To‘xtatish`, `🔁 Xatolarni qayta yuborish`,
+`🕵️ Tekshiruv`, `📄 Hisobot (CSV)`, `📋 Tarix`. Ruxsat: `auto.manage` (admin, superadmin).
+
+Xavfsizlik:
+
+| Qoida | Sabab |
+|---|---|
+| Har bir ID oldin `payer_nickname` bilan tekshiriladi | Topilmagan ID ga pul ketmaydi |
+| Natija noma’lum (timeout/5xx) → 🕵️ tekshiruv, avtomatik qayta yuborilmaydi | Pul ikki marta ketmasin |
+| Ulanish xatosi (so‘rov yetib bormagan) — 3 martagacha qayta urinish | Vaqtinchalik uzilishlar |
+| Worker so‘rov o‘rtasida to‘xtasa, o‘sha ID tekshiruvga tushadi | Restartdan keyin takror yo‘q |
+| Kassada mablag‘ yetmasa yoki ketma-ket 10 xato — avtomatik pauza + xabar | Keraksiz xatolar to‘planmasin |
+| Bitta partiyada bir ID bir marta (DB UNIQUE); summa `deposit_max` dan oshmaydi | Xato yozilgan summa |
+| Har bir amal `audit_logs` ga yoziladi | Kim, qachon, qancha |
+
+Ishlashi uchun **worker** (`python -m app.jobs`) ishlab turishi shart — markaz ekrani worker
+o‘chiq bo‘lsa ogohlantiradi. ID lar orasidagi pauza: `AUTO_DEPOSIT_DELAY_MS` (standart 300).
+Hamyondan kartaga avto payout sozlamalari endi `🤖 Avto to‘lov → 💳 Karta payout` ichida.
 
 ## 🌐 Telegram Web App (kassa ilovasi)
 

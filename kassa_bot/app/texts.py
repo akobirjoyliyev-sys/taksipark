@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from app.core.enums import (
+    AutoBatchStatus,
+    AutoItemStatus,
     LedgerReason,
     MassBatchStatus,
     MassItemStatus,
@@ -316,6 +318,22 @@ ITEM_STATUS = {
     MassItemStatus.PAID: "✅ to‘landi",
     MassItemStatus.FAILED: "⚠️ bajarilmadi",
     MassItemStatus.SKIPPED: "⏭ o‘tkazildi",
+}
+
+AUTO_BATCH_STATUS = {
+    AutoBatchStatus.DRAFT: "📝 Qoralama",
+    AutoBatchStatus.RUNNING: "🚀 Ishlayapti",
+    AutoBatchStatus.PAUSED: "⏸ Pauzada",
+    AutoBatchStatus.COMPLETED: "✅ Yakunlandi",
+    AutoBatchStatus.CANCELLED: "⛔ To‘xtatildi",
+}
+AUTO_ITEM_STATUS = {
+    AutoItemStatus.PENDING: "⏳ navbatda",
+    AutoItemStatus.PROCESSING: "🔄 yuborilmoqda",
+    AutoItemStatus.SUCCESS: "✅ o‘tkazildi",
+    AutoItemStatus.FAILED: "❌ xato",
+    AutoItemStatus.REVIEW: "🕵️ tekshiruv",
+    AutoItemStatus.SKIPPED: "⏭ o‘tkazib yuborildi",
 }
 
 # --------------------------------------------------------------------------- Mob-Cash: depozit

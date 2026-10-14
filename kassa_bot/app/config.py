@@ -81,6 +81,8 @@ class Config(BaseSettings):
     mobcash_timeout_seconds: int = 30
     cashdesk_api_url: str = "https://partners.servcul.com/CashdeskBotAPI"
     agent_api_base: str = "https://fg4fd7d5t6.com"
+    # 🤖 Avto to‘lov: ketma-ket depozitlar orasidagi pauza (kassa API'ni bosib yubormaslik uchun)
+    auto_deposit_delay_ms: int = 300
 
     # P2P (karta → karta) noyob summa bilan to‘lov
     p2p_sources: str = "CardXabarBot,HUMOcardbot"

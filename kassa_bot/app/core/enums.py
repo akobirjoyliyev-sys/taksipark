@@ -176,3 +176,25 @@ class ProviderStatus(StrEnum):
     FAILED = "failed"
     EXPIRED = "expired"
     NOT_FOUND = "not_found"
+
+
+class AutoBatchStatus(StrEnum):
+    """🤖 Avto to‘lov partiyasi: ID ro‘yxatiga kassadan ommaviy depozit."""
+
+    DRAFT = "draft"
+    RUNNING = "running"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class AutoItemStatus(StrEnum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    SUCCESS = "success"
+    FAILED = "failed"
+    REVIEW = "review"  # so‘rov yuborilgan, natija noma’lum — panelda tekshirish kerak
+    SKIPPED = "skipped"
+
+
+ACTIVE_AUTO_BATCH_STATUSES = (AutoBatchStatus.RUNNING, AutoBatchStatus.PAUSED)

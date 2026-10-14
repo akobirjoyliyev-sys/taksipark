@@ -30,7 +30,8 @@ from app import texts
 from app.config import Config
 from app.core.errors import DomainError, NotFoundError
 from app.mobcash import AgentClient, CashdeskClient, MobCashClient, MobCashError
-from app.models import Bookmaker, MobcashWithdrawal, P2PDeposit
+from app.core.enums import AutoBatchStatus
+from app.models import AutoDepositBatch, Bookmaker, MobcashWithdrawal, P2PDeposit
 from app.services.audit import Actor, AuditService
 from app.services.settings import SettingsService
 from app.userbot.crypto import SessionCipher, SessionCipherError
@@ -313,6 +314,11 @@ class BookmakerService:
             select(func.count(P2PDeposit.id)).where(P2PDeposit.bookmaker_id == bm.id)
         ) or await self.session.scalar(
             select(func.count(MobcashWithdrawal.id)).where(MobcashWithdrawal.bookmaker_id == bm.id)
+        ) or await self.session.scalar(
+            select(func.count(AutoDepositBatch.id)).where(
+                AutoDepositBatch.bookmaker_id == bm.id,
+                AutoDepositBatch.status != AutoBatchStatus.DRAFT,
+            )
         )
         if used:
             raise DomainError(

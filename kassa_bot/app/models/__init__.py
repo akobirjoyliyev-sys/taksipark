@@ -1,4 +1,5 @@
 from app.models.admin import Admin, AuditLog, SystemSetting
+from app.models.auto_deposit import AutoDepositBatch, AutoDepositItem
 from app.models.bonus import PromoActivation, PromoCode, ReferralReward, VipLevel
 from app.models.bookmaker import Bookmaker
 from app.models.channel import JoinRequest, RequiredChannel
@@ -12,6 +13,8 @@ from app.models.withdrawal import Withdrawal, WithdrawalStatusHistory
 __all__ = [
     "Admin",
     "AuditLog",
+    "AutoDepositBatch",
+    "AutoDepositItem",
     "BankTransaction",
     "Bookmaker",
     "JoinRequest",

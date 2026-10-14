@@ -5,10 +5,12 @@ from __future__ import annotations
 import logging
 from datetime import timedelta
 
+from app.admin.auto_deposit import HEARTBEAT_KEY, push_progress
 from app.admin.stats import render_report
 from app.bootstrap import AppContext
 from app.core.permissions import Perm
 from app.core.utils import fmt_dt, get_tz, utcnow
+from app.services.auto_deposit import StepEvent
 from app.services.stats import period_bounds
 
 log = logging.getLogger(__name__)
@@ -54,6 +56,24 @@ async def credit_p2p(ctx: AppContext) -> int:
                 bm = await svc.bookmakers.name_of(outcome.deposit.bookmaker_id)
                 await svc.notifier.p2p_deposit(outcome, admins, bm)
         return len(outcomes)
+
+
+async def auto_deposits(ctx: AppContext) -> int:
+    """🤖 Avto to‘lov: faol partiyalardagi ID larga ketma-ket depozit + jonli progress."""
+    await ctx.redis.set(HEARTBEAT_KEY, "1", ex=30)
+    async with ctx.sessionmaker() as session:
+        svc = ctx.services(session)
+
+        async def on_progress(event: StepEvent) -> None:
+            await ctx.redis.set(HEARTBEAT_KEY, "1", ex=30)
+            await push_progress(ctx.bot, svc, event)
+
+        events = await svc.auto.run_step(
+            on_progress=on_progress, delay=max(ctx.config.auto_deposit_delay_ms, 0) / 1000
+        )
+        for event in events:
+            await push_progress(ctx.bot, svc, event)
+        return sum(1 for e in events if e.kind != "progress")
 
 
 async def process_payouts(ctx: AppContext) -> int:

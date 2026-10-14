@@ -81,7 +81,20 @@ Oldindan: `docker compose up -d`, `.env`da `ADMIN_IDS` sizning ID, ikkinchi Tele
 - [ ] Progress (`🔄 Yangilash`), yakunda «Yakunlangan», `📄 To‘liq hisobot (CSV)`
 - [ ] Shu faylni 24 soat ichida qayta yuklash → dublikat
 
-### 🤖 Avto to‘lov
+### 🤖 Avto to‘lov markazi (ID lar ro‘yxatiga ommaviy depozit)
+- [ ] Markaz: 24 soatlik statistika, faol partiyalar progressi; worker o‘chiq bo‘lsa ogohlantirish
+- [ ] `🚀 Yangi avto to‘lov` → kassa tanlash (bitta bo‘lsa avtomatik) → balans ko‘rinadi
+- [ ] 300 ta ID ikki xabarda + .txt/.csv fayl → jami, takroriylar, tanilmaganlar ko‘rinadi
+- [ ] `123456789 - 15000` qatorlari o‘z summasi bilan; summasizlar uchun «qanchadan?» so‘raladi
+- [ ] Tezkor summa tugmalari va `20k`, `15 000` kiritish; `deposit_max` dan katta summa rad etiladi
+- [ ] Preview: jami, kassa balansi (yetadi/yetmaydi), 24 soatda pul olganlar soni; pul ketmaydi
+- [ ] `🚀 Boshlash` → tasdiq → worker o‘zi o‘tkazadi, progress xabari jonli yangilanadi
+- [ ] `⏸ Pauza` / `▶️ Davom ettirish` / `⛔ To‘xtatish` (navbatdagilar ⏭)
+- [ ] Topilmagan ID → ❌ (pul ketmaydi); timeout → 🕵️ tekshiruv (qayta yuborilmaydi)
+- [ ] Kassada mablag‘ yetmasa → avtomatik pauza + xabar; to‘ldirib davom ettirish
+- [ ] Yakunda CSV hisobot keladi; `🔁 Xatolarni qayta yuborish`, `🕵️ Tekshiruv` (✅/❌ belgilash)
+
+### 💳 Karta payout (Avto to‘lov markazi → «💳 Karta payout»)
 - [ ] Holat, limit, urinishlar, navbat statistikasi, provayder holati
 - [ ] Yoqish/o‘chirish va limit ⚙️ ning ikki bosqichli oqimi orqali
 - [ ] Avto yoqilgan + limit ichidagi ariza → avtomatik to‘lanadi

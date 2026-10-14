@@ -77,3 +77,17 @@ Holatlar:
   admin → `rejected`.
 - `mobcash_withdrawals`: `review` (so‘rov paytida) → `awaiting_payout` → `paid`;
   `awaiting_payout → refunded` (o‘yin hisobiga qaytarildi); rad etilgan → `failed`.
+
+## 🤖 Avto to‘lov (migratsiya `0006_auto_deposits`)
+
+| Jadval | Mazmuni | Cheklovlar |
+|---|---|---|
+| `auto_deposit_batches` | partiya: kassa (`bookmaker_id`, `kassa_name`), `default_amount`, jami, holat, kim boshlagan, progress xabari (`chat_id`, `message_id`), `pause_reason`, `consecutive_errors` | |
+| `auto_deposit_items` | har bir o‘yin ID: `payer_id`, `amount`, holat, `nickname`, urinishlar, xato, kassa javobi (`result`) | (`batch_id`, `payer_id`) UNIQUE |
+
+Holatlar:
+
+- `auto_deposit_batches`: `draft → running ⇄ paused → completed`; istalgan paytda `cancelled`.
+- `auto_deposit_items`: `pending → processing → success | failed | review`;
+  to‘xtatilganda `pending → skipped`; `failed → pending` (qayta yuborish);
+  `review → success | failed` (admin kassa panelida tekshirgach).

@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, Message
 
 from app import texts
 from app.admin import (
+    auto_deposit,
     bonus,
     bookmakers,
     channels,
@@ -46,6 +47,7 @@ def build_admin_router() -> Router:
         users.router,
         settings.router,
         payouts.router,
+        auto_deposit.router,
         join_requests.router,
         bonus.router,
         channels.router,

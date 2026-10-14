@@ -29,6 +29,7 @@ class Job:
 
 
 JOBS: tuple[Job, ...] = (
+    Job("auto_deposits", 2, tasks.auto_deposits),
     Job("process_payouts", 10, tasks.process_payouts),
     Job("poll_payouts", 15, tasks.poll_payouts),
     Job("expire_payments", 30, tasks.expire_payments),

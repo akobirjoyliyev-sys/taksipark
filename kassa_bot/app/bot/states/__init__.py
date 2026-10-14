@@ -71,3 +71,5 @@ class AdminStates(StatesGroup):
     userbot_phone = State()
     userbot_code = State()
     userbot_password = State()
+    auto_ids = State()
+    auto_amount = State()

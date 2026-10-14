@@ -1,4 +1,4 @@
-"""📦 Ommaviy to‘lov, 🤖 Avto to‘lov va 💸 Ruchnoy yechish bo‘limlari."""
+"""📦 Ommaviy to‘lov, 💳 Karta payout (🤖 Avto to‘lov markazidan) va 💸 Ruchnoy yechish."""
 
 from __future__ import annotations
 
@@ -239,7 +239,7 @@ async def auto_view(svc: Services, admin: Admin) -> tuple[str, InlineKeyboardMar
             + (f", oxirgi xato: {esc(h.last_error)}" if h.last_error else "")
         )
     text = (
-        "🤖 <b>Avto to‘lov</b>\n\n"
+        "💳 <b>Karta payout (hamyondan kartaga avto to‘lov)</b>\n\n"
         f"Holat: {'✅ Yoqilgan' if rt.auto_payout_enabled else '⛔ O‘chirilgan'}\n"
         f"Avto limit: {fmt_money(rt.auto_payout_max)} (undan katta — manual)\n"
         f"Maksimal urinishlar: {rt.payout_max_attempts} (eksponensial backoff)\n\n"
@@ -262,15 +262,8 @@ async def auto_view(svc: Services, admin: Admin) -> tuple[str, InlineKeyboardMar
             btn("🩺 Provayderni tekshirish", "ap", "health"),
             btn("🔄 Reconciliation", "ap", "reconcile"),
         )
-    b.row(btn("🔄 Yangilash", "ap", "view"))
+    b.row(btn("🔄 Yangilash", "ap", "view"), btn("🤖 Markaz", "au", "hub"))
     return text, b.as_markup()
-
-
-@router.message(F.text == texts.ADM_AUTO, HasPerm(Perm.AUTO_VIEW))
-async def show_auto(message: Message, state: FSMContext, svc: Services, admin: Admin) -> None:
-    await state.clear()
-    text, markup = await auto_view(svc, admin)
-    await message.answer(text, reply_markup=markup)
 
 
 @router.callback_query(

@@ -11,6 +11,7 @@ from app.mobcash import MobCashClient
 from app.payments.registry import ProviderRegistry
 from app.services.admins import AdminService
 from app.services.audit import AuditService
+from app.services.auto_deposit import AutoDepositService
 from app.services.bonus import PromoService, ReferralService, VipService
 from app.services.bookmakers import BookmakerService
 from app.services.channels import ChannelService, JoinRequestService, SubscriptionService
@@ -136,3 +137,7 @@ class Services:
     @cached_property
     def userbots(self) -> UserbotService:
         return UserbotService(self.session, self.settings)
+
+    @cached_property
+    def auto(self) -> AutoDepositService:
+        return AutoDepositService(self.session, self.settings, self.bookmakers)

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Kassa</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="splash">
+      <div class="logo-mark">₿</div>
+      <div class="spinner"></div>
+    </div>
+  </div>
+  <nav id="tabs" class="tabs hidden">
+    <button data-tab="home" class="tab active"><span class="ti">🏠</span><span>Asosiy</span></button>
+    <button data-tab="deposit" class="tab"><span class="ti">➕</span><span>To‘ldirish</span></button>
+    <button data-tab="withdraw" class="tab"><span class="ti">➖</span><span>Yechish</span></button>
+    <button data-tab="history" class="tab"><span class="ti">📋</span><span>Tarix</span></button>
+    <button data-tab="bonus" class="tab"><span class="ti">🎁</span><span>Bonus</span></button>
+  </nav>
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

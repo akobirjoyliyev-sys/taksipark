@@ -22,11 +22,20 @@ har ~60 soniyada Telegramga "men onlaynman" (`account.updateStatus`) signalini y
    python login.py
    ```
    Telefon raqam, SMS/Telegram kodi va (bo'lsa) 2FA parolni so'raydi.
-   Chiqqan uzun satrni `.env` dagi `SESSION_STRING=` ga qo'ying.
+   Seans avtomatik ravishda `.env` dagi `SESSION_STRING=` ga yoziladi.
 4. Ishga tushiring:
    ```bash
    python online.py
    ```
+
+## Ubuntu serverga bitta buyruq bilan o'rnatish
+
+Serverga SSH orqali kiring va bajaring:
+```bash
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/akobirjoyliyev-sys/taksipark/claude/vigilant-rubin-p5a6wd/userbot/install.sh)"
+```
+Skript hammasini o'rnatadi, `API_ID`/`API_HASH`, telefon raqam va kodni so'raydi,
+so'ng botni systemd xizmati sifatida ishga tushiradi (server qayta yonsa ham o'zi ishlaydi).
 
 ## 24/7 ishlatish (server / VPS)
 

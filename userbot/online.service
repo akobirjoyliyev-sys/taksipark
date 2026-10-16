@@ -1,0 +1,15 @@
+# systemd uchun (Docker'siz). /opt/userbot ni o'z yo'lingizga almashtiring.
+[Unit]
+Description=Telegram 24/7 online
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/userbot
+ExecStart=/opt/userbot/venv/bin/python -u online.py
+Restart=always
+RestartSec=10
+User=userbot
+
+[Install]
+WantedBy=multi-user.target
